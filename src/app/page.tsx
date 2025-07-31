@@ -1,103 +1,105 @@
-import Image from "next/image";
+'use client';
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import { Controller } from '@/components/Controller';
+import { Display } from '@/components/Display';
+import { useSocket } from '@/hooks/useSocket';
+import { useStore } from '@/store/useStore';
+import { Monitor, Gamepad2, Wifi, WifiOff, RotateCcw } from 'lucide-react';
 
 export default function Home() {
-  return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [activeTab, setActiveTab] = useState<'controller' | 'display'>('controller');
+  
+  // Initialize socket connection and get status
+  const { isConnected, emitReset } = useSocket();
+  const { activeRoomState, isResetting } = useStore();
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  const handleReset = () => {
+    emitReset();
+  };
+
+  return (
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+      {/* Tab Navigation with Status */}
+      <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between py-3">
+            {/* Left: Reset Button (subtle) */}
+            <div className="flex items-center">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleReset}
+                disabled={!isConnected || isResetting}
+                className="gap-2 text-gray-500 hover:text-gray-700 opacity-60 hover:opacity-100"
+              >
+                <RotateCcw className={`w-3 h-3 ${isResetting ? 'animate-spin' : ''}`} />
+                Reset
+              </Button>
+            </div>
+
+            {/* Center: Tab Navigation */}
+            <div className="flex space-x-6">
+              <Button
+                variant={activeTab === 'controller' ? 'default' : 'ghost'}
+                size="lg"
+                onClick={() => setActiveTab('controller')}
+                className={`gap-2 cursor-pointer ${
+                  activeTab === 'controller' 
+                    ? 'bg-[var(--pink-accent)] hover:bg-[var(--pink-accent)]/90 text-white' 
+                    : 'text-gray-700 hover:text-[var(--pink-accent)]'
+                }`}
+              >
+                <Gamepad2 className="w-5 h-5" />
+                Controller
+              </Button>
+              <Button
+                variant={activeTab === 'display' ? 'default' : 'ghost'}
+                size="lg"
+                onClick={() => setActiveTab('display')}
+                className={`gap-2 cursor-pointer ${
+                  activeTab === 'display' 
+                    ? 'bg-[var(--pink-accent)] hover:bg-[var(--pink-accent)]/90 text-white' 
+                    : 'text-gray-700 hover:text-[var(--pink-accent)]'
+                }`}
+              >
+                <Monitor className="w-5 h-5" />
+                Display
+              </Button>
+            </div>
+
+            {/* Right: Connection Status and Active State (subtle) */}
+            <div className="flex items-center gap-3">
+              {activeRoomState && (
+                <Badge variant="outline" className="text-xs bg-[var(--pink-accent)]/10 text-[var(--pink-accent)] border-[var(--pink-accent)]/20">
+                  {activeRoomState.replace('state', 'State ')}
+                </Badge>
+              )}
+              
+              {isConnected ? (
+                <div className="flex items-center gap-1 opacity-60">
+                  <Wifi className="w-3 h-3 text-green-500" />
+                  <span className="text-xs text-green-600">Connected</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 opacity-60">
+                  <WifiOff className="w-3 h-3 text-red-500" />
+                  <span className="text-xs text-red-600">Offline</span>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </div>
+
+      {/* Tab Content - Takes remaining height exactly */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        {activeTab === 'controller' && <Controller />}
+        {activeTab === 'display' && <Display />}
+      </div>
     </div>
   );
 }
