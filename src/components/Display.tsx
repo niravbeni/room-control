@@ -1,14 +1,12 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { useSocket } from '@/hooks/useSocket';
 import { useStore } from '@/store/useStore';
 import { Monitor } from 'lucide-react';
 
 export const Display: React.FC = () => {
-  const { isConnected } = useSocket();
-  const { activeRoomState, isResetting } = useStore();
+  const { activeRoomState } = useStore();
 
   const roomStateData = {
     state1: {

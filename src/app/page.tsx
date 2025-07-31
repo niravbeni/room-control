@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
 import { Controller } from '@/components/Controller';
 import { Display } from '@/components/Display';
 import { useSocket } from '@/hooks/useSocket';
