@@ -22,9 +22,7 @@ export const useSocket = (): UseSocketReturn => {
 
   useEffect(() => {
     // Initialize socket connection
-    socketRef.current = io({
-      path: '/api/socket'
-    });
+    socketRef.current = io();
 
     const socket = socketRef.current;
 
