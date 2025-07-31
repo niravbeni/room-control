@@ -33,7 +33,7 @@ export default function Home() {
                 size="sm"
                 onClick={handleReset}
                 disabled={!isConnected || isResetting}
-                className="gap-2 text-gray-500 hover:text-gray-700 opacity-60 hover:opacity-100"
+                className="gap-2 text-gray-500 hover:text-gray-700 opacity-60 hover:opacity-100 cursor-pointer"
               >
                 <RotateCcw className={`w-3 h-3 ${isResetting ? 'animate-spin' : ''}`} />
                 Reset

@@ -1,7 +1,6 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useSocket } from '@/hooks/useSocket';
 import { useStore } from '@/store/useStore';
 import { Monitor } from 'lucide-react';
 
