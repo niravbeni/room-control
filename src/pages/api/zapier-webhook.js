@@ -5,12 +5,18 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Get Zapier webhook URL from environment variable
-    const zapierUrl = process.env.ZAPIER_WEBHOOK_URL;
+    // Determine which webhook URL to use based on the request type
+    let zapierUrl;
+    if (req.body.type === 'room-action') {
+      zapierUrl = process.env.ZAPIER_WEBHOOK_URL;
+    } else if (req.body.type === 'room-state') {
+      zapierUrl = process.env.ZAPIER_ROOM_STATE_WEBHOOK_URL;
+    }
     
     if (!zapierUrl) {
-      console.error('ZAPIER_WEBHOOK_URL environment variable is not set');
-      return res.status(500).json({ error: 'Zapier webhook URL not configured' });
+      const missingVar = req.body.type === 'room-action' ? 'ZAPIER_WEBHOOK_URL' : 'ZAPIER_ROOM_STATE_WEBHOOK_URL';
+      console.error(`${missingVar} environment variable is not set`);
+      return res.status(500).json({ error: `${missingVar} not configured` });
     }
 
     // Forward the request to Zapier webhook

@@ -26,10 +26,10 @@ export default function RoomControl() {
     <div className="h-screen bg-gray-50 flex flex-col overflow-hidden" style={{height: '100vh', maxHeight: '100vh'}}>
       {/* Tab Navigation with Status - Smaller fixed height */}
       <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm" style={{height: '56px', minHeight: '56px', maxHeight: '56px'}}>
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 h-full">
+        <div className="max-w-7xl mx-auto px-0 h-full">
           <div className="flex items-center justify-between py-1 sm:py-2 h-full">
-            {/* Left: Reset Button (subtle) - Fixed width */}
-            <div className="flex items-center w-16 sm:w-20">
+            {/* Left: Reset Button (subtle) - Hugging left edge */}
+            <div className="flex items-center pl-2">
               <Button
                 variant="ghost"
                 size="sm"
@@ -72,8 +72,8 @@ export default function RoomControl() {
               </Button>
             </div>
 
-            {/* Right: Connection Status and Active State (subtle) - Fixed width */}
-            <div className="flex items-center gap-2 sm:gap-3 w-16 sm:w-24 justify-end">
+            {/* Right: Connection Status and Active State (subtle) - Hugging right edge */}
+            <div className="flex items-center gap-1 sm:gap-2 pr-2">
               {activeRoomState && (
                 <Badge variant="outline" className="text-xs bg-[var(--pink-accent)]/10 text-[var(--pink-accent)] border-[var(--pink-accent)]/20 hidden md:inline-flex">
                   S{activeRoomState.replace('state', '')}
