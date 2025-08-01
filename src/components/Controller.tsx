@@ -61,10 +61,19 @@ export const Controller: React.FC = () => {
       'coffee-lunch': 'Coffee/lunch order requested from room G08. Please coordinate delivery.'
     };
 
+    const actionNames = {
+      'tech-support': 'Tech Support',
+      'room-refresh': 'Room Refresh',
+      'extend-booking': 'Extend Booking',
+      'coffee-lunch': 'Coffee/Lunch Order'
+    };
+
     const message = messages[action as keyof typeof messages];
+    const actionName = actionNames[action as keyof typeof actionNames];
     
     const payload = {
-      action: action,
+      action: actionName,
+      actionId: action,
       message: message,
       room: 'G08',
       timestamp: new Date().toISOString(),
