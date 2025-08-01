@@ -52,7 +52,7 @@ export const Display: React.FC = () => {
   // Default state when nothing is selected
   if (!activeRoomState) {
     return (
-      <div className="h-full bg-gray-100 flex items-center justify-center p-4 sm:p-6 overflow-hidden" style={{height: '100%', maxHeight: '100%'}}>
+      <div className="h-full bg-gray-100 flex items-center justify-center p-4 sm:p-6 overflow-hidden" style={{height: '100%', maxHeight: '100%', paddingBottom: '16px'}}>
         <div className="text-center space-y-4 sm:space-y-6 max-w-2xl">
           <Monitor className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 text-gray-400 mx-auto" />
           <div className="space-y-2 sm:space-y-3">
@@ -67,10 +67,10 @@ export const Display: React.FC = () => {
   const currentState = roomStateData[activeRoomState];
 
   return (
-    <div className={`h-full ${currentState.bgColor} flex items-center justify-center p-3 sm:p-4 overflow-hidden`} style={{height: '100%', maxHeight: '100%'}}>
+    <div className={`h-full ${currentState.bgColor} flex items-center justify-center p-2 sm:p-3 overflow-hidden`} style={{height: '100%', maxHeight: '100%', paddingBottom: '16px'}}>
       {/* Full-screen centered content */}
-      <Card className={`w-full max-w-5xl h-full max-h-full ${currentState.borderColor} border-4 shadow-2xl overflow-hidden flex flex-col`}>
-        <CardHeader className="text-center py-4 sm:py-6 bg-white/50 flex-shrink-0">
+      <Card className={`w-full max-w-5xl ${currentState.borderColor} border-4 shadow-2xl overflow-hidden flex flex-col`} style={{height: 'calc(100% - 16px)', maxHeight: 'calc(100% - 16px)'}}>
+        <CardHeader className="text-center py-3 sm:py-4 bg-white/50 flex-shrink-0">
           <CardTitle className={`text-3xl sm:text-4xl md:text-5xl font-bold ${currentState.accentColor} mb-2 sm:mb-3 leading-tight`}>
             {currentState.title}
           </CardTitle>
@@ -78,7 +78,7 @@ export const Display: React.FC = () => {
             {currentState.subtitle}
           </p>
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col items-center justify-center py-4 sm:py-6 space-y-4 sm:space-y-6 min-h-0 overflow-hidden">
+        <CardContent className="flex-1 flex flex-col items-center justify-center py-3 sm:py-4 space-y-3 sm:space-y-4 min-h-0 overflow-hidden">
           <div className="text-center max-w-3xl px-2">
             <p className="text-base sm:text-lg text-gray-700 leading-tight sm:leading-relaxed">
               {currentState.description}

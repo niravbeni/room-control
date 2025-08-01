@@ -36,11 +36,11 @@ export const Controller: React.FC = () => {
 
   return (
     <div className="h-full bg-gray-50 flex flex-col overflow-hidden" style={{height: '100%', maxHeight: '100%'}}>
-      {/* Content Area - Precise height management */}
-      <div className="flex-1 flex flex-col p-3 sm:p-4 gap-3 sm:gap-4 overflow-hidden" style={{height: '100%', maxHeight: '100%'}}>
+      {/* Content Area - Account for selection rings and prevent bottom clipping */}
+      <div className="flex-1 flex flex-col p-2 sm:p-3 gap-2 sm:gap-3 overflow-hidden" style={{height: '100%', maxHeight: '100%', paddingBottom: '16px'}}>
         {/* TOP SECTION - 4 Room Action Cards in 2x2 Grid - BIGGER */}
-        <div className="flex-[2] overflow-hidden" style={{minHeight: '0'}}>
-          <div className="h-full grid grid-cols-2 gap-3 sm:gap-4">
+        <div className="flex-[2] overflow-visible" style={{minHeight: '0'}}>
+          <div className="h-full grid grid-cols-2 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 8px)'}}>
             {roomActions.map((action) => (
               <Card
                 key={action.id}
@@ -66,13 +66,13 @@ export const Controller: React.FC = () => {
           </div>
         </div>
 
-        {/* BOTTOM SECTION - 4 Room State Cards in 1x4 Grid - SMALLER */}
-        <div className="flex-[1] overflow-hidden" style={{minHeight: '0'}}>
-          <div className="h-full grid grid-cols-4 gap-3 sm:gap-4">
+        {/* BOTTOM SECTION - 4 Room State Cards in 1x4 Grid - SMALLER with ring space */}
+        <div className="flex-[1] overflow-visible" style={{minHeight: '0'}}>
+          <div className="h-full grid grid-cols-4 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 24px)'}}>
             {roomStates.map((state) => (
               <Card
                 key={state.id}
-                className={`h-full cursor-pointer transition-all duration-200 hover:scale-[1.02] border-0 shadow-lg overflow-hidden bg-white hover:bg-gray-100 py-0 gap-0 ${
+                className={`h-full cursor-pointer transition-all duration-200 hover:scale-[1.02] border-0 shadow-lg overflow-hidden bg-white hover:bg-gray-100 py-0 gap-0 m-1 ${
                   activeRoomState === state.id 
                     ? 'ring-4 ring-[#CB1A84] shadow-2xl scale-105' 
                     : 'hover:shadow-2xl'

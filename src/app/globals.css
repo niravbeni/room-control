@@ -128,11 +128,10 @@
     text-size-adjust: 100%;
   }
   
-  /* iOS Safari fixes */
+  /* iOS Safari fixes - Less aggressive */
   html {
     height: 100%;
     height: -webkit-fill-available;
-    overflow: hidden;
   }
   
   body {
@@ -140,23 +139,21 @@
     min-height: -webkit-fill-available;
     height: 100vh;
     height: -webkit-fill-available;
-    overflow: hidden;
-  }
-  
-  /* Prevent iOS Safari bounce scroll and any overflow */
-  html, body {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
     margin: 0;
     padding: 0;
+    /* Prevent scroll but allow selection rings */
+    overflow-x: hidden;
+    overflow-y: hidden;
+    position: fixed;
+    width: 100%;
   }
   
   /* Force exact viewport usage */
   #__next {
     height: 100vh;
     height: -webkit-fill-available;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: hidden;
   }
   
   /* Better touch targets for mobile */
@@ -179,6 +176,12 @@
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+  }
+  
+  /* Ensure selection rings show properly */
+  .ring-4 {
+    /* Make sure rings have space to show */
+    margin: 2px;
   }
 }
 
