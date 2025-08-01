@@ -1,46 +1,44 @@
 import { create } from 'zustand';
 
-export type RoomAction = 'action1' | 'action2' | 'action3' | 'action4';
+export type RoomAction = 'tech-support' | 'room-refresh' | 'extend-booking' | 'coffee-lunch';
 export type RoomState = 'state1' | 'state2' | 'state3' | 'state4' | null;
 
-interface StoreState {
-  // Current active tab
-  activeTab: 'controller' | 'display';
-  
-  // Current room state being displayed (for full-screen display)
+interface RoomStore {
   activeRoomState: RoomState;
-  
-  // System status
   isConnected: boolean;
   isResetting: boolean;
-  
-  // Actions
-  setActiveTab: (tab: 'controller' | 'display') => void;
+  resetCallbacks: Array<() => void>; // Add callback system for reset
   setActiveRoomState: (state: RoomState) => void;
-  setConnectionStatus: (connected: boolean) => void;
-  resetSystem: () => void;
-  setResetting: (resetting: boolean) => void;
+  setIsConnected: (connected: boolean) => void;
+  setIsResetting: (resetting: boolean) => void;
+  addResetCallback: (callback: () => void) => void;
+  removeResetCallback: (callback: () => void) => void;
+  triggerReset: () => void;
 }
 
-export const useStore = create<StoreState>((set) => ({
-  // Initial state
-  activeTab: 'controller',
+export const useStore = create<RoomStore>((set, get) => ({
   activeRoomState: null,
   isConnected: false,
   isResetting: false,
-  
-  // Actions
-  setActiveTab: (tab) => set({ activeTab: tab }),
+  resetCallbacks: [],
   
   setActiveRoomState: (state) => set({ activeRoomState: state }),
+  setIsConnected: (connected) => set({ isConnected: connected }),
+  setIsResetting: (resetting) => set({ isResetting: resetting }),
   
-  setConnectionStatus: (connected) => set({ isConnected: connected }),
+  addResetCallback: (callback) => set((state) => ({
+    resetCallbacks: [...state.resetCallbacks, callback]
+  })),
   
-  resetSystem: () =>
-    set({
-      activeRoomState: null,
-      isResetting: false,
-    }),
+  removeResetCallback: (callback) => set((state) => ({
+    resetCallbacks: state.resetCallbacks.filter(cb => cb !== callback)
+  })),
   
-  setResetting: (resetting) => set({ isResetting: resetting }),
+  triggerReset: () => {
+    // Reset the main state
+    set({ activeRoomState: null, isResetting: false });
+    // Trigger all registered callbacks
+    const { resetCallbacks } = get();
+    resetCallbacks.forEach(callback => callback());
+  },
 })); 

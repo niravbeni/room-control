@@ -9,15 +9,17 @@ import { useSocket } from '@/hooks/useSocket';
 import { useStore } from '@/store/useStore';
 import { Monitor, Gamepad2, Wifi, WifiOff, RotateCcw } from 'lucide-react';
 
-export default function Home() {
+export default function RoomControl() {
   const [activeTab, setActiveTab] = useState<'controller' | 'display'>('controller');
   
   // Initialize socket connection and get status
   const { isConnected, emitReset } = useSocket();
-  const { activeRoomState, isResetting } = useStore();
+  const { activeRoomState, isResetting, triggerReset, setIsResetting } = useStore();
 
   const handleReset = () => {
+    setIsResetting(true);
     emitReset();
+    triggerReset(); // This will clear both room state and clicked actions
   };
 
   return (

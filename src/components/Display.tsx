@@ -12,40 +12,32 @@ export const Display: React.FC = () => {
 
   const roomStateData = {
     state1: {
-      title: 'Room State 1',
-      subtitle: 'First Display Configuration',
-      description: 'This is the full-screen display for Room State 1. Here you can show any information, status, or content related to this state.',
+      title: 'Room Refresh Requested',
+      message: 'A room cleaning has been requested. The cleaning team will arrive shortly to refresh this space.',
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
       accentColor: 'text-blue-600',
-      badgeColor: 'bg-blue-500',
     },
     state2: {
-      title: 'Room State 2',
-      subtitle: 'Second Display Configuration',
-      description: 'This is the full-screen display for Room State 2. You can customize this content to show different information for each state.',
+      title: 'Wrapping Up Meeting',
+      message: 'We are finishing up our session. Please give us 5 more minutes to conclude and gather our materials.',
       bgColor: 'bg-green-50',
       borderColor: 'border-green-200',
       accentColor: 'text-green-600',
-      badgeColor: 'bg-green-500',
     },
     state3: {
-      title: 'Room State 3',
-      subtitle: 'Third Display Configuration',
-      description: 'This is the full-screen display for Room State 3. Each state can have completely different layouts and content.',
+      title: 'Lunch Break Time',
+      message: 'We are taking a lunch break. Please bring our lunch order in 15 minutes. Thank you!',
       bgColor: 'bg-purple-50',
       borderColor: 'border-purple-200',
       accentColor: 'text-purple-600',
-      badgeColor: 'bg-purple-500',
     },
     state4: {
-      title: 'Room State 4',
-      subtitle: 'Fourth Display Configuration',
-      description: 'This is the full-screen display for Room State 4. Perfect for showing different room configurations or status information.',
+      title: 'Do Not Disturb',
+      message: 'Coffee order has been cancelled. Please do not disturb our meeting. We are in an important session.',
       bgColor: 'bg-orange-50',
       borderColor: 'border-orange-200',
       accentColor: 'text-orange-600',
-      badgeColor: 'bg-orange-500',
     },
   };
 
@@ -70,27 +62,20 @@ export const Display: React.FC = () => {
     <div className={`h-full ${currentState.bgColor} flex items-center justify-center p-2 sm:p-3 overflow-hidden mobile-safe-bottom ipad-safe-bottom desktop-safe-bottom mobile-content ios-ultra-safe ipad-ultra-safe`} style={{height: '100%', maxHeight: '100%'}}>
       {/* Full-screen centered content with EXTREME bottom clearance */}
       <Card className={`w-full max-w-5xl ${currentState.borderColor} border-4 shadow-2xl overflow-hidden flex flex-col`} style={{height: 'calc(100% - 56px)', maxHeight: 'calc(100% - 56px)'}}>
-        <CardHeader className="text-center py-3 sm:py-4 bg-white/50 flex-shrink-0">
-          <CardTitle className={`text-3xl sm:text-4xl md:text-5xl font-bold ${currentState.accentColor} mb-2 sm:mb-3 leading-tight`}>
+        <CardHeader className="text-center py-6 sm:py-8 bg-white/50 flex-shrink-0">
+          <CardTitle className={`text-4xl sm:text-5xl md:text-6xl font-bold ${currentState.accentColor} mb-4 sm:mb-6 leading-tight`}>
             {currentState.title}
           </CardTitle>
-          <p className="text-lg sm:text-xl text-gray-600 font-medium leading-tight">
-            {currentState.subtitle}
-          </p>
         </CardHeader>
-        <CardContent className="flex-1 flex flex-col items-center justify-center py-3 sm:py-4 space-y-3 sm:space-y-4 min-h-0 overflow-hidden">
-          <div className="text-center max-w-3xl px-2">
-            <p className="text-base sm:text-lg text-gray-700 leading-tight sm:leading-relaxed">
-              {currentState.description}
+        <CardContent className="flex-1 flex flex-col items-center justify-center py-8 sm:py-12 px-6 sm:px-12 min-h-0 overflow-hidden">
+          {/* Large text message filling most of the card */}
+          <div className="text-center max-w-4xl">
+            <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-700 leading-relaxed font-medium">
+              {currentState.message}
             </p>
           </div>
           
-          {/* Large visual indicator */}
-          <div className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-full ${currentState.bgColor} ${currentState.borderColor} border-6 sm:border-8 flex items-center justify-center animate-pulse shadow-xl flex-shrink-0`}>
-            <span className={`text-3xl sm:text-4xl font-bold ${currentState.accentColor}`}>
-              {activeRoomState.replace('state', '')}
-            </span>
-          </div>
+          {/* Remove the number indicator completely */}
         </CardContent>
       </Card>
     </div>

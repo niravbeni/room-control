@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useStore, RoomAction, RoomState } from '@/store/useStore';
 
@@ -12,56 +12,47 @@ interface UseSocketReturn {
 
 export const useSocket = (): UseSocketReturn => {
   const socketRef = useRef<Socket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  
   const { 
-    setConnectionStatus, 
-    setActiveRoomState,
-    resetSystem, 
-    setResetting,
-    isConnected 
+    setActiveRoomState, 
+    setIsConnected: setStoreConnected, 
+    setIsResetting 
   } = useStore();
 
   useEffect(() => {
     // Initialize socket connection
     socketRef.current = io();
 
-    const socket = socketRef.current;
-
-    // Connection events
-    socket.on('connect', () => {
+    // Connection event handlers
+    socketRef.current.on('connect', () => {
       console.log('Connected to server');
-      setConnectionStatus(true);
+      setIsConnected(true);
+      setStoreConnected(true);
     });
 
-    socket.on('disconnect', () => {
+    socketRef.current.on('disconnect', () => {
       console.log('Disconnected from server');
-      setConnectionStatus(false);
+      setIsConnected(false);
+      setStoreConnected(false);
     });
 
-    // Room action response (top buttons - do nothing for now)
-    socket.on('room-action-response', (data: { action: RoomAction }) => {
-      console.log('Room action triggered (no effect):', data);
-      // Do nothing for now as requested
-    });
-
-    // Room state change (bottom buttons - change display)
-    socket.on('room-state-change', (data: { state: RoomState }) => {
-      console.log('Room state changed:', data);
+    // Room state events
+    socketRef.current.on('roomStateChanged', (data: { state: RoomState }) => {
+      console.log('Room state changed:', data.state);
       setActiveRoomState(data.state);
     });
 
-    // System reset event
-    socket.on('system-reset', () => {
+    socketRef.current.on('systemReset', () => {
       console.log('System reset received');
-      setResetting(true);
-      resetSystem();
-      setTimeout(() => setResetting(false), 1000);
+      setActiveRoomState(null);
+      setIsResetting(false);
     });
 
-    // Cleanup on unmount
     return () => {
-      socket.disconnect();
+      socketRef.current?.disconnect();
     };
-  }, [setConnectionStatus, setActiveRoomState, resetSystem, setResetting]);
+  }, [setActiveRoomState, setStoreConnected, setIsResetting]);
 
   // Emit functions
   const emitRoomAction = (action: RoomAction) => {
