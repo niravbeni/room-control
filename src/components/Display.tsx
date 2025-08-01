@@ -8,14 +8,14 @@ export const Display: React.FC = () => {
   const roomStateData = {
     state1: {
       title: 'Room Refresh Requested',
-      message: 'Ready for Room Refresh',
+      message: 'Ready for Room Refresh.',
       bgColor: 'bg-blue-50',
       borderColor: 'border-blue-200',
       accentColor: 'text-blue-600',
     },
     state2: {
       title: 'Wrapping Up Meeting',
-      message: 'Wrapping up. Please give us 5 more mins',
+      message: 'Wrapping up. Please give us 5 more mins.',
       bgColor: 'bg-green-50',
       borderColor: 'border-green-200',
       accentColor: 'text-green-600',
@@ -31,7 +31,7 @@ export const Display: React.FC = () => {
     },
     state4: {
       title: 'Do Not Disturb',
-      message: 'Cancel the coffee order. Do not Disturb',
+      message: 'Cancel the coffee order. Do not Disturb.',
       bgColor: 'bg-orange-50',
       borderColor: 'border-orange-200',
       accentColor: 'text-orange-600',
