@@ -36,11 +36,11 @@ export const Controller: React.FC = () => {
 
   return (
     <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
-      {/* Content Area - Better spacing and sizing */}
-      <div className="flex-1 flex flex-col p-4 gap-4 min-h-0 max-h-full">
+      {/* Content Area - Mobile optimized spacing */}
+      <div className="flex-1 flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 min-h-0 max-h-full">
         {/* TOP SECTION - 4 Room Action Cards in 2x2 Grid - BIGGER */}
         <div className="flex-[2] min-h-0">
-          <div className="h-full grid grid-cols-2 gap-4">
+          <div className="h-full grid grid-cols-2 gap-2 sm:gap-4">
             {roomActions.map((action) => (
               <Card
                 key={action.id}
@@ -52,11 +52,11 @@ export const Controller: React.FC = () => {
                 onClick={() => !(!isConnected || isResetting) && handleRoomAction(action.id)}
               >
                 <CardContent className="h-full flex flex-col items-center justify-center p-0 m-0 px-0">
-                  <div className="text-center space-y-3 p-6 text-gray-800 w-full h-full flex flex-col items-center justify-center">
-                    <h2 className="text-4xl font-bold">
+                  <div className="text-center space-y-2 sm:space-y-3 p-3 sm:p-6 text-gray-800 w-full h-full flex flex-col items-center justify-center">
+                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
                       {action.label}
                     </h2>
-                    <p className="text-xl font-medium text-gray-600">
+                    <p className="text-base sm:text-lg md:text-xl font-medium text-gray-600 leading-tight">
                       {action.subtitle}
                     </p>
                   </div>
@@ -68,7 +68,7 @@ export const Controller: React.FC = () => {
 
         {/* BOTTOM SECTION - 4 Room State Cards in 1x4 Grid - SMALLER */}
         <div className="flex-[1] min-h-0">
-          <div className="h-full grid grid-cols-4 gap-4">
+          <div className="h-full grid grid-cols-4 gap-2 sm:gap-4">
             {roomStates.map((state) => (
               <Card
                 key={state.id}
@@ -84,13 +84,13 @@ export const Controller: React.FC = () => {
                 onClick={() => !(!isConnected || isResetting) && handleRoomStateChange(state.id)}
               >
                 <CardContent className="h-full flex flex-col items-center justify-center p-0 m-0 px-0">
-                  <div className={`text-center space-y-2 p-4 w-full h-full flex flex-col items-center justify-center ${
+                  <div className={`text-center space-y-1 sm:space-y-2 p-2 sm:p-4 w-full h-full flex flex-col items-center justify-center ${
                     activeRoomState === state.id ? 'text-[#CB1A84]' : 'text-gray-800'
                   }`}>
-                    <h2 className="text-2xl font-bold">
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight">
                       {state.label}
                     </h2>
-                    <p className={`text-base font-medium ${
+                    <p className={`text-sm sm:text-base font-medium leading-tight ${
                       activeRoomState === state.id ? 'text-[#CB1A84]/80' : 'text-gray-600'
                     }`}>
                       {state.subtitle}
