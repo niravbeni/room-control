@@ -36,8 +36,8 @@ export const Controller: React.FC = () => {
 
   return (
     <div className="h-full bg-gray-50 flex flex-col overflow-hidden" style={{height: '100%', maxHeight: '100%'}}>
-      {/* Content Area - Responsive safe area padding */}
-      <div className="flex-1 flex flex-col p-2 sm:p-3 gap-2 sm:gap-3 overflow-hidden mobile-safe-bottom ipad-safe-bottom" style={{height: '100%', maxHeight: '100%'}}>
+      {/* Content Area - Maximum aggressive safe area padding for all devices */}
+      <div className="flex-1 flex flex-col p-2 sm:p-3 gap-2 sm:gap-3 overflow-hidden mobile-safe-bottom ipad-safe-bottom desktop-safe-bottom mobile-content" style={{height: '100%', maxHeight: '100%'}}>
         {/* TOP SECTION - 4 Room Action Cards in 2x2 Grid - BIGGER with hover effects */}
         <div className="flex-[2] overflow-visible" style={{minHeight: '0'}}>
           <div className="h-full grid grid-cols-2 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 12px)'}}>
@@ -66,9 +66,9 @@ export const Controller: React.FC = () => {
           </div>
         </div>
 
-        {/* BOTTOM SECTION - 4 Room State Cards in 1x4 Grid - SMALLER with ring space */}
+        {/* BOTTOM SECTION - 4 Room State Cards in 1x4 Grid - SMALLER with maximum bottom space */}
         <div className="flex-[1] overflow-visible" style={{minHeight: '0'}}>
-          <div className="h-full grid grid-cols-4 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 32px)'}}>
+          <div className="h-full grid grid-cols-4 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 48px)'}}>
             {roomStates.map((state) => (
               <Card
                 key={state.id}
