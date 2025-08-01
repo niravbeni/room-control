@@ -5,8 +5,16 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Get Zapier webhook URL from environment variable
+    const zapierUrl = process.env.ZAPIER_WEBHOOK_URL;
+    
+    if (!zapierUrl) {
+      console.error('ZAPIER_WEBHOOK_URL environment variable is not set');
+      return res.status(500).json({ error: 'Zapier webhook URL not configured' });
+    }
+
     // Forward the request to Zapier webhook
-    const zapierResponse = await fetch('https://hooks.zapier.com/hooks/catch/23995235/u4ms15h/', {
+    const zapierResponse = await fetch(zapierUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
