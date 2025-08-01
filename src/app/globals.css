@@ -183,6 +183,20 @@
     /* Make sure rings have space to show */
     margin: 2px;
   }
+  
+  /* Additional mobile safe area padding */
+  @media (max-width: 768px) {
+    .mobile-safe-bottom {
+      padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+    }
+  }
+  
+  /* iPad specific adjustments */
+  @media (min-width: 768px) and (max-width: 1024px) {
+    .ipad-safe-bottom {
+      padding-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+    }
+  }
 }
 
 @layer components {

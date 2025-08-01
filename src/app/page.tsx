@@ -71,7 +71,7 @@ export default function Home() {
             </div>
 
             {/* Right: Connection Status and Active State (subtle) - Fixed width */}
-            <div className="flex items-center gap-1 w-16 sm:w-24 justify-end">
+            <div className="flex items-center gap-2 sm:gap-3 w-16 sm:w-24 justify-end">
               {activeRoomState && (
                 <Badge variant="outline" className="text-xs bg-[var(--pink-accent)]/10 text-[var(--pink-accent)] border-[var(--pink-accent)]/20 hidden md:inline-flex">
                   S{activeRoomState.replace('state', '')}

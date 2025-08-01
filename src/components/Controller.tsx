@@ -36,27 +36,27 @@ export const Controller: React.FC = () => {
 
   return (
     <div className="h-full bg-gray-50 flex flex-col overflow-hidden" style={{height: '100%', maxHeight: '100%'}}>
-      {/* Content Area - Account for selection rings and prevent bottom clipping */}
-      <div className="flex-1 flex flex-col p-2 sm:p-3 gap-2 sm:gap-3 overflow-hidden" style={{height: '100%', maxHeight: '100%', paddingBottom: '16px'}}>
-        {/* TOP SECTION - 4 Room Action Cards in 2x2 Grid - BIGGER */}
+      {/* Content Area - Responsive safe area padding */}
+      <div className="flex-1 flex flex-col p-2 sm:p-3 gap-2 sm:gap-3 overflow-hidden mobile-safe-bottom ipad-safe-bottom" style={{height: '100%', maxHeight: '100%'}}>
+        {/* TOP SECTION - 4 Room Action Cards in 2x2 Grid - BIGGER with hover effects */}
         <div className="flex-[2] overflow-visible" style={{minHeight: '0'}}>
-          <div className="h-full grid grid-cols-2 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 8px)'}}>
+          <div className="h-full grid grid-cols-2 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 12px)'}}>
             {roomActions.map((action) => (
               <Card
                 key={action.id}
-                className={`h-full cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-xl border-0 shadow-lg overflow-hidden bg-white hover:bg-gray-100 py-0 gap-0 ${
+                className={`h-full cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] active:shadow-md border-0 shadow-lg overflow-hidden bg-white hover:bg-gray-50 active:bg-gray-100 py-0 gap-0 ${
                   !isConnected || isResetting 
                     ? 'opacity-50 cursor-not-allowed' 
                     : ''
                 }`}
                 onClick={() => !(!isConnected || isResetting) && handleRoomAction(action.id)}
               >
-                <CardContent className="h-full flex flex-col items-center justify-center p-0 m-0 px-0">
-                  <div className="text-center space-y-2 sm:space-y-3 p-3 sm:p-6 text-gray-800 w-full h-full flex flex-col items-center justify-center">
+                <CardContent className="h-full flex flex-col items-center justify-center p-0 m-0 px-0 transition-all duration-200">
+                  <div className="text-center space-y-2 sm:space-y-3 p-3 sm:p-6 text-gray-800 w-full h-full flex flex-col items-center justify-center transition-all duration-200 hover:text-gray-900">
                     <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-tight">
                       {action.label}
                     </h2>
-                    <p className="text-base sm:text-lg md:text-xl font-medium text-gray-600 leading-tight">
+                    <p className="text-base sm:text-lg md:text-xl font-medium text-gray-600 leading-tight group-hover:text-gray-700">
                       {action.subtitle}
                     </p>
                   </div>
@@ -68,7 +68,7 @@ export const Controller: React.FC = () => {
 
         {/* BOTTOM SECTION - 4 Room State Cards in 1x4 Grid - SMALLER with ring space */}
         <div className="flex-[1] overflow-visible" style={{minHeight: '0'}}>
-          <div className="h-full grid grid-cols-4 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 24px)'}}>
+          <div className="h-full grid grid-cols-4 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 32px)'}}>
             {roomStates.map((state) => (
               <Card
                 key={state.id}
