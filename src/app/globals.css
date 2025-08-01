@@ -132,18 +132,31 @@
   html {
     height: 100%;
     height: -webkit-fill-available;
+    overflow: hidden;
   }
   
   body {
     min-height: 100vh;
     min-height: -webkit-fill-available;
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow: hidden;
   }
   
-  /* Prevent iOS Safari bounce scroll */
+  /* Prevent iOS Safari bounce scroll and any overflow */
   html, body {
     overflow: hidden;
     position: fixed;
     width: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Force exact viewport usage */
+  #__next {
+    height: 100vh;
+    height: -webkit-fill-available;
+    overflow: hidden;
   }
   
   /* Better touch targets for mobile */
@@ -153,13 +166,19 @@
     touch-action: manipulation;
   }
   
-  /* iOS Safari safe area support */
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top);
+  /* Remove any default margins/padding that could cause overflow */
+  * {
+    box-sizing: border-box;
   }
   
-  .safe-area-bottom {
-    padding-bottom: env(safe-area-inset-bottom);
+  /* Prevent text selection on mobile for better UX */
+  .no-select {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 }
 

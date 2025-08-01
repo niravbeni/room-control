@@ -21,11 +21,11 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden">
+    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden" style={{height: '100vh', maxHeight: '100vh'}}>
       {/* Tab Navigation with Status - Fixed height to prevent shifting */}
-      <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-          <div className="flex items-center justify-between py-2 sm:py-3 min-h-[60px]">
+      <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm" style={{height: '64px', minHeight: '64px', maxHeight: '64px'}}>
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 h-full">
+          <div className="flex items-center justify-between py-2 sm:py-3 h-full">
             {/* Left: Reset Button (subtle) - Fixed width */}
             <div className="flex items-center w-20 sm:w-24">
               <Button
@@ -94,8 +94,8 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Tab Content - iOS Safari safe area handling */}
-      <div className="flex-1 min-h-0 overflow-hidden" style={{height: 'calc(100vh - 60px)', minHeight: 'calc(100vh - 60px)'}}>
+      {/* Tab Content - Precise height calculation to prevent overflow */}
+      <div className="flex-1 overflow-hidden" style={{height: 'calc(100vh - 64px)', maxHeight: 'calc(100vh - 64px)', minHeight: 'calc(100vh - 64px)'}}>
         {activeTab === 'controller' && <Controller />}
         {activeTab === 'display' && <Display />}
       </div>
