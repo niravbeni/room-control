@@ -23,8 +23,8 @@ export const Display: React.FC = () => {
     state3: {
       title: 'Lunch Break Time',
       message: calculatedTime 
-        ? `Can you bring the order at ${calculatedTime}?`
-        : 'Can you bring the order at 2:15pm?',
+        ? `Please bring the lunch at ${calculatedTime}?`
+        : 'Please bring the lunch at 2:15pm?',
       bgColor: 'bg-purple-50',
       borderColor: 'border-purple-200',
       accentColor: 'text-purple-600',
