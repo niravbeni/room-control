@@ -357,13 +357,13 @@ export const Controller: React.FC = () => {
 
         {/* BOTTOM SECTION - 5 Room State Cards in 1x5 Grid - SMALLER with EXTREME bottom space */}
         <div className="flex-[1] overflow-visible" style={{minHeight: '0'}}>
-          <div className="h-full grid grid-cols-5 gap-1 sm:gap-2 p-1" style={{height: 'calc(100% - 40px)'}}>
+          <div className="h-full grid grid-cols-5 gap-2 sm:gap-3 p-2" style={{height: 'calc(100% - 40px)'}}>
             {roomStates.map((state) => (
               <Card
                 key={state.id}
-                className={`h-full cursor-pointer transition-all duration-200 hover:scale-[1.02] border-0 shadow-lg overflow-hidden bg-white hover:bg-gray-100 py-0 gap-0 ${
+                className={`h-full cursor-pointer transition-all duration-200 hover:scale-[1.01] border-0 shadow-lg overflow-hidden bg-white hover:bg-gray-100 py-0 gap-0 ${
                   activeRoomState === state.id 
-                    ? 'ring-2 sm:ring-4 ring-[#CB1A84] shadow-2xl scale-105' 
+                    ? 'ring-2 sm:ring-3 ring-[#CB1A84] shadow-2xl' 
                     : 'hover:shadow-2xl'
                 } ${
                   !isConnected || isResetting 
@@ -391,9 +391,9 @@ export const Controller: React.FC = () => {
             
             {/* Custom Message Button - 5th button with edit icon */}
             <Card
-              className={`h-full cursor-pointer transition-all duration-200 hover:scale-[1.02] border-0 shadow-lg overflow-hidden bg-white hover:bg-gray-100 py-0 gap-0 relative ${
+              className={`h-full cursor-pointer transition-all duration-200 hover:scale-[1.01] border-0 shadow-lg overflow-hidden bg-white hover:bg-gray-100 py-0 gap-0 relative ${
                 activeRoomState === 'custom' 
-                  ? 'ring-2 sm:ring-4 ring-[#CB1A84] shadow-2xl scale-105' 
+                  ? 'ring-2 sm:ring-3 ring-[#CB1A84] shadow-2xl' 
                   : 'hover:shadow-2xl'
               } ${
                 !isConnected || isResetting 
