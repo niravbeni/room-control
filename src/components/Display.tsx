@@ -62,21 +62,22 @@ export const Display: React.FC = () => {
     <div className={`h-full ${currentState.bgColor} flex items-center justify-center p-2 sm:p-3 overflow-hidden mobile-safe-bottom ipad-safe-bottom desktop-safe-bottom mobile-content ios-ultra-safe ipad-ultra-safe`} style={{height: '100%', maxHeight: '100%'}}>
       {/* Full-screen centered content with EXTREME bottom clearance */}
       <Card className={`w-full max-w-5xl ${currentState.borderColor} border-4 shadow-2xl overflow-hidden flex flex-col`} style={{height: 'calc(100% - 56px)', maxHeight: 'calc(100% - 56px)'}}>
-        <CardHeader className="text-center py-6 sm:py-8 bg-white/50 flex-shrink-0">
-          <CardTitle className={`text-4xl sm:text-5xl md:text-6xl font-bold ${currentState.accentColor} mb-4 sm:mb-6 leading-tight`}>
-            {currentState.title}
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="flex-1 flex flex-col items-center justify-center py-8 sm:py-12 px-6 sm:px-12 min-h-0 overflow-hidden">
-          {/* Large text message filling most of the card */}
+        {/* Centered content - both header and body together */}
+        <div className="flex-1 flex flex-col items-center justify-center py-4 sm:py-6 px-6 sm:px-12 min-h-0 overflow-hidden">
+          {/* Title closer to center */}
+          <div className="text-center mb-6 sm:mb-8">
+            <h1 className={`text-4xl sm:text-5xl md:text-6xl font-bold ${currentState.accentColor} leading-tight`}>
+              {currentState.title}
+            </h1>
+          </div>
+          
+          {/* Body text closer to center */}
           <div className="text-center max-w-4xl">
             <p className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-gray-700 leading-relaxed font-medium">
               {currentState.message}
             </p>
           </div>
-          
-          {/* Remove the number indicator completely */}
-        </CardContent>
+        </div>
       </Card>
     </div>
   );
