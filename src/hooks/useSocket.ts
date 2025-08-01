@@ -38,12 +38,12 @@ export const useSocket = (): UseSocketReturn => {
     });
 
     // Room state events
-    socketRef.current.on('roomStateChanged', (data: { state: RoomState }) => {
+    socketRef.current.on('room-state-change', (data: { state: RoomState }) => {
       console.log('Room state changed:', data.state);
       setActiveRoomState(data.state);
     });
 
-    socketRef.current.on('systemReset', () => {
+    socketRef.current.on('system-reset', () => {
       console.log('System reset received');
       setActiveRoomState(null);
       setIsResetting(false);
