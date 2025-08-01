@@ -33,7 +33,7 @@ export default function Home() {
                 size="sm"
                 onClick={handleReset}
                 disabled={!isConnected || isResetting}
-                className="gap-1 sm:gap-2 text-gray-500 hover:text-gray-700 opacity-60 hover:opacity-100 cursor-pointer text-xs sm:text-sm"
+                className="gap-1 sm:gap-2 text-gray-500 hover:text-gray-700 opacity-80 hover:opacity-100 cursor-pointer text-xs sm:text-sm"
               >
                 <RotateCcw className={`w-3 h-3 ${isResetting ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">Reset</span>
@@ -79,12 +79,12 @@ export default function Home() {
               )}
               
               {isConnected ? (
-                <div className="flex items-center gap-1 opacity-60">
+                <div className="flex items-center gap-1 opacity-80">
                   <Wifi className="w-3 h-3 text-green-500" />
                   <span className="text-xs text-green-600 hidden sm:inline">Connected</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 opacity-60">
+                <div className="flex items-center gap-1 opacity-80">
                   <WifiOff className="w-3 h-3 text-red-500" />
                   <span className="text-xs text-red-600 hidden sm:inline">Offline</span>
                 </div>

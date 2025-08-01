@@ -36,8 +36,8 @@ export const Controller: React.FC = () => {
 
   return (
     <div className="h-full bg-gray-50 flex flex-col overflow-hidden">
-      {/* Content Area - Mobile optimized spacing */}
-      <div className="flex-1 flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 min-h-0 max-h-full">
+      {/* Content Area - Mobile optimized spacing with bottom safe area */}
+      <div className="flex-1 flex flex-col p-2 sm:p-4 gap-2 sm:gap-4 min-h-0 max-h-full pb-4 sm:pb-6" style={{paddingBottom: 'max(1rem, env(safe-area-inset-bottom))'}}>
         {/* TOP SECTION - 4 Room Action Cards in 2x2 Grid - BIGGER */}
         <div className="flex-[2] min-h-0">
           <div className="h-full grid grid-cols-2 gap-2 sm:gap-4">
@@ -66,8 +66,8 @@ export const Controller: React.FC = () => {
           </div>
         </div>
 
-        {/* BOTTOM SECTION - 4 Room State Cards in 1x4 Grid - SMALLER */}
-        <div className="flex-[1] min-h-0">
+        {/* BOTTOM SECTION - 4 Room State Cards in 1x4 Grid - SMALLER with extra bottom margin */}
+        <div className="flex-[1] min-h-0 mb-2 sm:mb-4">
           <div className="h-full grid grid-cols-4 gap-2 sm:gap-4">
             {roomStates.map((state) => (
               <Card
