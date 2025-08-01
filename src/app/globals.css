@@ -187,24 +187,34 @@
   /* Additional mobile safe area padding */
   @media (max-width: 768px) {
     .mobile-safe-bottom {
-      padding-bottom: max(40px, env(safe-area-inset-bottom, 40px));
+      padding-bottom: max(48px, env(safe-area-inset-bottom, 48px));
     }
     
     /* Extra aggressive iOS Safari fixes */
     body {
-      padding-bottom: env(safe-area-inset-bottom, 20px);
+      padding-bottom: env(safe-area-inset-bottom, 24px);
     }
     
     /* Ensure content doesn't get clipped by iOS UI */
     .mobile-content {
-      margin-bottom: max(20px, env(safe-area-inset-bottom, 20px));
+      margin-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+    }
+    
+    /* Ultra-extreme iOS specific spacing */
+    .ios-ultra-safe {
+      padding-bottom: max(60px, env(safe-area-inset-bottom, 60px)) !important;
     }
   }
   
   /* iPad specific adjustments */
   @media (min-width: 768px) and (max-width: 1024px) {
     .ipad-safe-bottom {
-      padding-bottom: max(28px, env(safe-area-inset-bottom, 28px));
+      padding-bottom: max(32px, env(safe-area-inset-bottom, 32px));
+    }
+    
+    /* iPad ultra-safe spacing */  
+    .ipad-ultra-safe {
+      padding-bottom: max(40px, env(safe-area-inset-bottom, 40px)) !important;
     }
   }
   
