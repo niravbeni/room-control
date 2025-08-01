@@ -54,7 +54,6 @@ export const Controller: React.FC = () => {
   };
 
   const sendToZapier = async (action: RoomAction) => {
-    // Placeholder for Zapier webhook - API key to be added later
     const messages = {
       'tech-support': 'Tech support requested from room G08. Please send someone to resolve.',
       'room-refresh': 'Room refresh requested from room G08. Please prepare for cleaning.',
@@ -64,68 +63,12 @@ export const Controller: React.FC = () => {
 
     const message = messages[action as keyof typeof messages];
     
-    try {
-      // TODO: Replace with actual Zapier webhook URL when API key is provided
-      console.log('Zapier webhook would send:', { action, message, room: 'G08' });
-      
-      /*
-      await fetch('ZAPIER_WEBHOOK_URL_HERE', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, message, room: 'G08' })
-      });
-      */
-    } catch (error) {
-      console.error('Failed to send to Zapier:', error);
-    }
-  };
-
-  const sendRoomStateToZapier = async (state: RoomState) => {
-    // Room state data matching what's in Display component
-    const roomStateData = {
-      state1: {
-        title: 'Room Refresh Requested',
-        message: 'A room cleaning has been requested. The cleaning team will arrive shortly to refresh this space.',
-        bgColor: 'bg-blue-50',
-        borderColor: 'border-blue-200',
-        accentColor: 'text-blue-600',
-      },
-      state2: {
-        title: 'Wrapping Up Meeting',
-        message: 'We are finishing up our session. Please give us 5 more minutes to conclude and gather our materials.',
-        bgColor: 'bg-green-50',
-        borderColor: 'border-green-200',
-        accentColor: 'text-green-600',
-      },
-      state3: {
-        title: 'Lunch Break Time',
-        message: 'We are taking a lunch break. Please bring our lunch order in 15 minutes. Thank you!',
-        bgColor: 'bg-purple-50',
-        borderColor: 'border-purple-200',
-        accentColor: 'text-purple-600',
-      },
-      state4: {
-        title: 'Do Not Disturb',
-        message: 'Coffee order has been cancelled. Please do not disturb our meeting. We are in an important session.',
-        bgColor: 'bg-orange-50',
-        borderColor: 'border-orange-200',
-        accentColor: 'text-orange-600',
-      },
-    };
-
-    const stateData = roomStateData[state as keyof typeof roomStateData];
-    
-    if (!stateData) return;
-
     const payload = {
-      state: state,
-      title: stateData.title,
-      message: stateData.message,
+      action: action,
+      message: message,
       room: 'G08',
       timestamp: new Date().toISOString(),
-      bgColor: stateData.bgColor,
-      borderColor: stateData.borderColor,
-      accentColor: stateData.accentColor
+      type: 'room-action'
     };
     
     try {
@@ -140,24 +83,21 @@ export const Controller: React.FC = () => {
       const result = await response.json();
 
       if (response.ok) {
-        console.log('Successfully sent room state to Zapier:', payload);
+        console.log('Successfully sent room action to Zapier:', payload);
         console.log('Zapier response:', result.zapierResponse);
       } else {
         console.error('Failed to send to Zapier:', response.status, result);
       }
     } catch (error) {
-      console.error('Failed to send room state to Zapier:', error);
+      console.error('Failed to send room action to Zapier:', error);
     }
   };
 
-  const handleRoomStateChange = async (state: RoomState) => {
+
+
+  const handleRoomStateChange = (state: RoomState) => {
     // These change the display page
     emitRoomStateChange(state);
-    
-    // Send to Zapier webhook for the 4 main room states
-    if (state && ['state1', 'state2', 'state3', 'state4'].includes(state)) {
-      await sendRoomStateToZapier(state);
-    }
   };
 
   const handleCustomMessageSelect = () => {
