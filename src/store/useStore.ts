@@ -1,14 +1,16 @@
 import { create } from 'zustand';
 
 export type RoomAction = 'tech-support' | 'room-refresh' | 'extend-booking' | 'coffee-lunch';
-export type RoomState = 'state1' | 'state2' | 'state3' | 'state4' | null;
+export type RoomState = 'state1' | 'state2' | 'state3' | 'state4' | 'custom' | null;
 
 interface RoomStore {
   activeRoomState: RoomState;
+  customMessage: string; // Add custom message storage
   isConnected: boolean;
   isResetting: boolean;
   resetCallbacks: Array<() => void>; // Add callback system for reset
   setActiveRoomState: (state: RoomState) => void;
+  setCustomMessage: (message: string) => void; // Add custom message setter
   setIsConnected: (connected: boolean) => void;
   setIsResetting: (resetting: boolean) => void;
   addResetCallback: (callback: () => void) => void;
@@ -18,11 +20,13 @@ interface RoomStore {
 
 export const useStore = create<RoomStore>((set, get) => ({
   activeRoomState: null,
+  customMessage: '', // Initialize custom message
   isConnected: false,
   isResetting: false,
   resetCallbacks: [],
   
   setActiveRoomState: (state) => set({ activeRoomState: state }),
+  setCustomMessage: (message) => set({ customMessage: message }), // Add custom message setter
   setIsConnected: (connected) => set({ isConnected: connected }),
   setIsResetting: (resetting) => set({ isResetting: resetting }),
   
@@ -35,8 +39,8 @@ export const useStore = create<RoomStore>((set, get) => ({
   })),
   
   triggerReset: () => {
-    // Reset the main state
-    set({ activeRoomState: null, isResetting: false });
+    // Reset the main state including custom message
+    set({ activeRoomState: null, customMessage: '', isResetting: false });
     // Trigger all registered callbacks
     const { resetCallbacks } = get();
     resetCallbacks.forEach(callback => callback());

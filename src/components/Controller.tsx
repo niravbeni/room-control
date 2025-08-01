@@ -4,18 +4,25 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useSocket } from '@/hooks/useSocket';
 import { useStore, RoomAction, RoomState } from '@/store/useStore';
 import { useState, useEffect } from 'react';
+import { Edit } from 'lucide-react';
 
 export const Controller: React.FC = () => {
-  const { emitRoomAction, emitRoomStateChange, isConnected } = useSocket();
-  const { activeRoomState, isResetting, addResetCallback, removeResetCallback } = useStore();
+  const { emitRoomAction, emitRoomStateChange, emitCustomMessage, isConnected } = useSocket();
+  const { activeRoomState, customMessage, isResetting, addResetCallback, removeResetCallback, setCustomMessage } = useStore();
   
   // Track which action buttons have been clicked
   const [clickedActions, setClickedActions] = useState<Set<string>>(new Set());
+  
+  // Custom message input state
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customInputText, setCustomInputText] = useState('');
 
   // Register reset callback to clear clicked actions
   useEffect(() => {
     const resetCallback = () => {
       setClickedActions(new Set()); // Clear all clicked actions on reset
+      setShowCustomInput(false); // Close custom input
+      setCustomInputText(''); // Clear input text
     };
     
     addResetCallback(resetCallback);
@@ -73,9 +80,123 @@ export const Controller: React.FC = () => {
     }
   };
 
-  const handleRoomStateChange = (state: RoomState) => {
+  const sendRoomStateToZapier = async (state: RoomState) => {
+    // Room state data matching what's in Display component
+    const roomStateData = {
+      state1: {
+        title: 'Room Refresh Requested',
+        message: 'A room cleaning has been requested. The cleaning team will arrive shortly to refresh this space.',
+        bgColor: 'bg-blue-50',
+        borderColor: 'border-blue-200',
+        accentColor: 'text-blue-600',
+      },
+      state2: {
+        title: 'Wrapping Up Meeting',
+        message: 'We are finishing up our session. Please give us 5 more minutes to conclude and gather our materials.',
+        bgColor: 'bg-green-50',
+        borderColor: 'border-green-200',
+        accentColor: 'text-green-600',
+      },
+      state3: {
+        title: 'Lunch Break Time',
+        message: 'We are taking a lunch break. Please bring our lunch order in 15 minutes. Thank you!',
+        bgColor: 'bg-purple-50',
+        borderColor: 'border-purple-200',
+        accentColor: 'text-purple-600',
+      },
+      state4: {
+        title: 'Do Not Disturb',
+        message: 'Coffee order has been cancelled. Please do not disturb our meeting. We are in an important session.',
+        bgColor: 'bg-orange-50',
+        borderColor: 'border-orange-200',
+        accentColor: 'text-orange-600',
+      },
+    };
+
+    const stateData = roomStateData[state as keyof typeof roomStateData];
+    
+    if (!stateData) return;
+
+    const payload = {
+      state: state,
+      title: stateData.title,
+      message: stateData.message,
+      room: 'G08',
+      timestamp: new Date().toISOString(),
+      bgColor: stateData.bgColor,
+      borderColor: stateData.borderColor,
+      accentColor: stateData.accentColor
+    };
+    
+    try {
+      const response = await fetch('/api/zapier-webhook', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        console.log('Successfully sent room state to Zapier:', payload);
+        console.log('Zapier response:', result.zapierResponse);
+      } else {
+        console.error('Failed to send to Zapier:', response.status, result);
+      }
+    } catch (error) {
+      console.error('Failed to send room state to Zapier:', error);
+    }
+  };
+
+  const handleRoomStateChange = async (state: RoomState) => {
     // These change the display page
     emitRoomStateChange(state);
+    
+    // Send to Zapier webhook for the 4 main room states
+    if (state && ['state1', 'state2', 'state3', 'state4'].includes(state)) {
+      await sendRoomStateToZapier(state);
+    }
+  };
+
+  const handleCustomMessageSelect = () => {
+    // Main button click - select/deselect the custom message state
+    if (activeRoomState === 'custom') {
+      // If already showing custom message, toggle off
+      handleRoomStateChange(null);
+    } else if (customMessage) {
+      // If there's a message, show it
+      handleRoomStateChange('custom');
+    } else {
+      // No message exists, open editor to create one
+      handleCustomMessageEdit();
+    }
+  };
+
+  const handleCustomMessageEdit = (e?: React.MouseEvent) => {
+    // Stop event propagation to prevent triggering the main button
+    if (e) {
+      e.stopPropagation();
+    }
+    
+    // Show input for custom message
+    setShowCustomInput(true);
+    setCustomInputText(customMessage); // Pre-fill with existing message
+  };
+
+  const submitCustomMessage = () => {
+    if (customInputText.trim()) {
+      setCustomMessage(customInputText.trim());
+      emitCustomMessage(customInputText.trim());
+      handleRoomStateChange('custom');
+    }
+    setShowCustomInput(false);
+  };
+
+  const cancelCustomMessage = () => {
+    setShowCustomInput(false);
+    setCustomInputText('');
   };
 
   // Top 4 buttons (2x2 grid) - Room Actions with Zapier integration
@@ -110,7 +231,7 @@ export const Controller: React.FC = () => {
     },
   ];
 
-  // Bottom 4 buttons (1x4 grid) - Room State (change display)
+  // Bottom 5 buttons (1x5 grid) - Room State (change display) + Custom Message
   const roomStates = [
     { id: 'state1' as RoomState, label: 'Call Room Refresh', subtitle: 'Request room cleaning' },
     { id: 'state2' as RoomState, label: 'Wrapping Up', subtitle: 'Give us 5 more minutes' },
@@ -161,9 +282,9 @@ export const Controller: React.FC = () => {
           </div>
         </div>
 
-        {/* BOTTOM SECTION - 4 Room State Cards in 1x4 Grid - SMALLER with EXTREME bottom space */}
+        {/* BOTTOM SECTION - 5 Room State Cards in 1x5 Grid - SMALLER with EXTREME bottom space */}
         <div className="flex-[1] overflow-visible" style={{minHeight: '0'}}>
-          <div className="h-full grid grid-cols-4 gap-2 sm:gap-3 p-1" style={{height: 'calc(100% - 56px)'}}>
+          <div className="h-full grid grid-cols-5 gap-1 sm:gap-2 p-1" style={{height: 'calc(100% - 56px)'}}>
             {roomStates.map((state) => (
               <Card
                 key={state.id}
@@ -179,13 +300,13 @@ export const Controller: React.FC = () => {
                 onClick={() => !(!isConnected || isResetting) && handleRoomStateChange(state.id)}
               >
                 <CardContent className="h-full flex flex-col items-center justify-center p-0 m-0 px-0">
-                  <div className={`text-center space-y-1 sm:space-y-2 p-2 sm:p-4 w-full h-full flex flex-col items-center justify-center ${
+                  <div className={`text-center space-y-1 p-1 sm:p-2 w-full h-full flex flex-col items-center justify-center ${
                     activeRoomState === state.id ? 'text-[#CB1A84]' : 'text-gray-800'
                   }`}>
-                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight">
+                    <h2 className="text-sm sm:text-base md:text-lg font-bold leading-tight">
                       {state.label}
                     </h2>
-                    <p className={`text-sm sm:text-base font-medium leading-tight ${
+                    <p className={`text-xs sm:text-sm font-medium leading-tight ${
                       activeRoomState === state.id ? 'text-[#CB1A84]/80' : 'text-gray-600'
                     }`}>
                       {state.subtitle}
@@ -194,9 +315,94 @@ export const Controller: React.FC = () => {
                 </CardContent>
               </Card>
             ))}
+            
+            {/* Custom Message Button - 5th button with edit icon */}
+            <Card
+              className={`h-full cursor-pointer transition-all duration-200 hover:scale-[1.02] border-0 shadow-lg overflow-hidden bg-white hover:bg-gray-100 py-0 gap-0 m-1 relative ${
+                activeRoomState === 'custom' 
+                  ? 'ring-4 ring-[#CB1A84] shadow-2xl scale-105' 
+                  : 'hover:shadow-2xl'
+              } ${
+                !isConnected || isResetting 
+                  ? 'opacity-50 cursor-not-allowed' 
+                  : ''
+              }`}
+              onClick={() => !(!isConnected || isResetting) && handleCustomMessageSelect()}
+            >
+              {/* Edit icon in bottom-right corner - bigger and centered with more padding */}
+              <button
+                className="absolute bottom-2 right-2 z-10 p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-colors duration-200 opacity-70 hover:opacity-100 flex items-center justify-center"
+                onClick={(e) => !(!isConnected || isResetting) && handleCustomMessageEdit(e)}
+                style={{ minWidth: '32px', minHeight: '32px' }}
+                aria-label="Edit custom message"
+              >
+                <Edit className="w-4 h-4 text-gray-600" />
+              </button>
+
+              <CardContent className="h-full flex flex-col items-center justify-center p-0 m-0 px-0">
+                <div className={`text-center space-y-1 p-1 sm:p-2 w-full h-full flex flex-col items-center justify-center ${
+                  activeRoomState === 'custom' ? 'text-[#CB1A84]' : 'text-gray-800'
+                }`}>
+                  {customMessage ? (
+                    <>
+                      <h2 className="text-xs sm:text-sm md:text-base font-bold leading-tight">
+                        Custom Message
+                      </h2>
+                      <p className={`text-xs sm:text-sm font-medium leading-tight ${
+                        activeRoomState === 'custom' ? 'text-[#CB1A84]/80' : 'text-gray-600'
+                      }`}>
+                        {customMessage.length > 50 ? `${customMessage.substring(0, 50)}...` : customMessage}
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-sm sm:text-base md:text-lg font-bold leading-tight">
+                        Custom Message
+                      </h2>
+                      <p className={`text-xs sm:text-sm font-medium leading-tight ${
+                        activeRoomState === 'custom' ? 'text-[#CB1A84]/80' : 'text-gray-600'
+                      }`}>
+                        Add message
+                      </p>
+                    </>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
+
+      {/* Custom Message Input Modal */}
+      {showCustomInput && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Custom Display Message</h3>
+            <textarea
+              value={customInputText}
+              onChange={(e) => setCustomInputText(e.target.value)}
+              placeholder="Enter your custom message for the display screen..."
+              className="w-full h-32 p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#CB1A84] focus:border-transparent"
+              maxLength={200}
+            />
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={submitCustomMessage}
+                disabled={!customInputText.trim()}
+                className="flex-1 bg-[#CB1A84] text-white py-2 px-4 rounded-lg font-medium hover:bg-[#CB1A84]/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Display Message
+              </button>
+              <button
+                onClick={cancelCustomMessage}
+                className="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }; 

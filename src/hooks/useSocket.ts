@@ -3,10 +3,10 @@ import { io, Socket } from 'socket.io-client';
 import { useStore, RoomAction, RoomState } from '@/store/useStore';
 
 interface UseSocketReturn {
-  socket: Socket | null;
   isConnected: boolean;
   emitRoomAction: (action: RoomAction) => void;
   emitRoomStateChange: (state: RoomState) => void;
+  emitCustomMessage: (message: string) => void; // Add custom message emit function
   emitReset: () => void;
 }
 
@@ -16,6 +16,7 @@ export const useSocket = (): UseSocketReturn => {
   
   const { 
     setActiveRoomState, 
+    setCustomMessage,
     setIsConnected: setStoreConnected, 
     setIsResetting 
   } = useStore();
@@ -43,6 +44,13 @@ export const useSocket = (): UseSocketReturn => {
       setActiveRoomState(data.state);
     });
 
+    // Custom message events
+    socketRef.current.on('custom-message', (data: { message: string }) => {
+      console.log('Custom message received:', data.message);
+      setCustomMessage(data.message);
+      setActiveRoomState('custom');
+    });
+
     socketRef.current.on('system-reset', () => {
       console.log('System reset received');
       setActiveRoomState(null);
@@ -52,32 +60,30 @@ export const useSocket = (): UseSocketReturn => {
     return () => {
       socketRef.current?.disconnect();
     };
-  }, [setActiveRoomState, setStoreConnected, setIsResetting]);
+  }, [setActiveRoomState, setCustomMessage, setStoreConnected, setIsResetting]);
 
   // Emit functions
   const emitRoomAction = (action: RoomAction) => {
-    if (socketRef.current) {
-      socketRef.current.emit('room-action', { action });
-    }
+    socketRef.current?.emit('room-action', { action });
   };
 
   const emitRoomStateChange = (state: RoomState) => {
-    if (socketRef.current) {
-      socketRef.current.emit('room-state-change', { state });
-    }
+    socketRef.current?.emit('room-state-change', { state });
+  };
+
+  const emitCustomMessage = (message: string) => {
+    socketRef.current?.emit('custom-message', { message });
   };
 
   const emitReset = () => {
-    if (socketRef.current) {
-      socketRef.current.emit('reset-system');
-    }
+    socketRef.current?.emit('reset-system');
   };
 
   return {
-    socket: socketRef.current,
     isConnected,
     emitRoomAction,
     emitRoomStateChange,
+    emitCustomMessage,
     emitReset,
   };
 }; 

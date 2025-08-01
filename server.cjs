@@ -50,6 +50,13 @@ app.prepare().then(() => {
       io.emit('room-state-change', data);
     });
 
+    // Handle custom message events
+    socket.on('custom-message', (data) => {
+      console.log('Custom message triggered:', data);
+      // Broadcast custom message to all clients
+      io.emit('custom-message', data);
+    });
+
     // Handle reset action
     socket.on('reset-system', () => {
       console.log('System reset triggered');
