@@ -82,25 +82,22 @@ export const CateringScreen: React.FC = () => {
     return activeMessages.filter(msg => msg.roomId === roomId).length;
   };
 
+  // Check if each room has active messages
+  const hasRoomAMessages = getMessageCount('dashboard-a') > 0;
+  const hasRoomBMessages = getMessageCount('dashboard-b') > 0;
+  const hasRoomCMessages = getMessageCount('dashboard-c') > 0;
+
   return (
     <div className="h-screen w-full flex flex-col">
       {/* Map Section - Top area (White background) */}
-      <div className="flex-1 bg-white flex items-center justify-center relative">
+      <div className="h-[50%] bg-white flex flex-col items-center justify-center relative p-4">
         {/* Connection Status Indicator - Top right */}
         <div className="absolute top-4 right-4">
           <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
         </div>
 
-        {/* Map placeholder area - keep space for the floor plan */}
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="text-center text-gray-400">
-            <p className="text-xl font-medium">Floor Map Area</p>
-            <p className="text-sm mt-1">Map will be placed here</p>
-          </div>
-        </div>
-
-        {/* Room Navigation Buttons - Positioned over the map area */}
-        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex gap-3">
+        {/* Room Navigation Buttons - Positioned above the map */}
+        <div className="mb-4 flex gap-4">
           {roomButtons.map((room) => {
             const messageCount = getMessageCount(room.id);
             const hasMessages = messageCount > 0;
@@ -113,7 +110,7 @@ export const CateringScreen: React.FC = () => {
                 onClick={() => handleRoomClick(room.id)}
                 disabled={!hasMessages}
                 className={`
-                  relative px-3 py-1.5 rounded font-medium text-white transition-all duration-300 text-sm cursor-pointer
+                  relative px-4 py-2 rounded-lg font-medium text-white transition-all duration-300 text-sm cursor-pointer
                   ${hasMessages 
                     ? 'bg-blue-500 hover:bg-blue-600' 
                     : 'bg-gray-400 cursor-not-allowed opacity-50'
@@ -132,20 +129,81 @@ export const CateringScreen: React.FC = () => {
             );
           })}
         </div>
+
+        {/* Layered SVG Map System */}
+        <div className="flex items-center justify-center">
+          {/* Container with fixed aspect ratio to ensure perfect alignment */}
+          <div className="relative w-[400px] h-[300px] max-w-full max-h-full">
+            {/* Base Map Layer */}
+            <Image
+              src="/map.svg"
+              alt="Floor Map"
+              width={800}
+              height={600}
+              className="w-full h-full object-contain"
+              priority
+            />
+            
+            {/* Room A Overlay Layer */}
+            {hasRoomAMessages && (
+              <Image
+                src="/room-a.svg"
+                alt="Room A Active"
+                width={800}
+                height={600}
+                className="absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-300"
+                style={{
+                  filter: roomFlashStates['dashboard-a'] ? 'drop-shadow(0 0 10px rgba(34, 197, 94, 0.8))' : 'none'
+                }}
+                priority
+              />
+            )}
+            
+            {/* Room B Overlay Layer */}
+            {hasRoomBMessages && (
+              <Image
+                src="/room-b.svg"
+                alt="Room B Active"
+                width={800}
+                height={600}
+                className="absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-300"
+                style={{
+                  filter: roomFlashStates['dashboard-b'] ? 'drop-shadow(0 0 10px rgba(34, 197, 94, 0.8))' : 'none'
+                }}
+                priority
+              />
+            )}
+            
+            {/* Room C Overlay Layer */}
+            {hasRoomCMessages && (
+              <Image
+                src="/room-c.svg"
+                alt="Room C Active"
+                width={800}
+                height={600}
+                className="absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-300"
+                style={{
+                  filter: roomFlashStates['dashboard-c'] ? 'drop-shadow(0 0 10px rgba(34, 197, 94, 0.8))' : 'none'
+                }}
+                priority
+              />
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Content Section */}
       {selectedMessage ? (
         <>
           {/* Room Number Section - Light pink background */}
-          <div className="bg-pink-400 py-8 text-center">
+          <div className="bg-pink-400 py-6 text-center">
             <h1 className="text-4xl font-bold text-white">
               Room No {roomNumberMap[selectedMessage.roomId]}
             </h1>
           </div>
 
           {/* Message Content and Buttons Section - Dark pink background */}
-          <div className="bg-pink-600 flex flex-col items-center justify-center py-8 px-8 min-h-[320px]">
+          <div className="bg-pink-600 flex flex-col items-center justify-center py-8 px-8 flex-1">
             {/* Message Content */}
             <div className="text-center mb-8 flex-1 flex items-center justify-center">
               <h2 className="text-5xl font-bold text-white leading-tight max-w-4xl">
@@ -154,11 +212,11 @@ export const CateringScreen: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4">
+            <div className="flex gap-6 mb-4">
               <button
                 onClick={handleSeen}
                 disabled={!isConnected || selectedMessage.status === 'seen'}
-                className="px-8 py-4 text-xl font-semibold bg-black text-white rounded-2xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-w-[160px] h-[60px] flex items-center justify-center gap-3 transition-all"
+                className="px-8 py-4 text-lg font-semibold bg-black text-white rounded-2xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-w-[160px] h-[60px] flex items-center justify-center gap-3 transition-all"
               >
                 <Image src="/eye.png" alt="Eye" width={24} height={24} className="w-6 h-6" />
                 Seen
@@ -167,7 +225,7 @@ export const CateringScreen: React.FC = () => {
               <button
                 onClick={handleResolved}
                 disabled={!isConnected}
-                className="px-8 py-4 text-xl font-semibold bg-white text-black rounded-2xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-w-[160px] h-[60px] flex items-center justify-center gap-3 transition-all"
+                className="px-8 py-4 text-lg font-semibold bg-white text-black rounded-2xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-w-[160px] h-[60px] flex items-center justify-center gap-3 transition-all"
               >
                 <Image src="/resolved.png" alt="Resolve" width={24} height={24} className="w-6 h-6" />
                 Resolved
@@ -178,12 +236,12 @@ export const CateringScreen: React.FC = () => {
       ) : (
         <>
           {/* No message state - Light pink header */}
-          <div className="bg-pink-400 py-8 text-center">
+          <div className="bg-pink-400 py-6 text-center">
             <h1 className="text-4xl font-bold text-white">No Messages</h1>
           </div>
           
           {/* No message content - Dark pink background */}
-          <div className="bg-pink-600 flex flex-col justify-center items-center py-8 min-h-[320px]">
+          <div className="bg-pink-600 flex flex-col justify-center items-center py-8 flex-1">
             <div className="text-center text-white">
               <p className="text-2xl opacity-80">Waiting for room requests...</p>
             </div>
