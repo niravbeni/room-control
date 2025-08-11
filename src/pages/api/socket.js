@@ -19,23 +19,38 @@ const SocketHandler = (req, res) => {
     io.on('connection', (socket) => {
       console.log('Client connected:', socket.id);
 
-      // Handle room actions from top buttons (2x2 grid) - do nothing for now
-      socket.on('room-action', (data) => {
-        console.log('Room action triggered (no effect):', data);
-        // Broadcast to all clients but no functionality yet
-        io.emit('room-action-response', data);
+      // Handle message sending from dashboard screens
+      socket.on('send-message', (data) => {
+        // Generate a unique messageId on the server to ensure all clients get the same ID
+        const messageId = `${data.roomId}-${Date.now()}`;
+        const messageData = {
+          ...data,
+          messageId: messageId
+        };
+        // Broadcast to all clients (especially catering screen)
+        io.emit('message-sent', messageData);
       });
 
-      // Handle room state changes from bottom buttons (1x4 grid) - change display
-      socket.on('room-state-change', (data) => {
-        console.log('Room state change triggered:', data);
-        // Broadcast to all clients (changes Display page)
-        io.emit('room-state-change', data);
+      // Handle message seen action from catering screen
+      socket.on('message-seen', (data) => {
+        // Broadcast to all clients (especially dashboard screens)
+        io.emit('message-seen', data);
+      });
+
+      // Handle message resolved action from catering screen
+      socket.on('message-resolved', (data) => {
+        // Broadcast to all clients (especially dashboard screens)
+        io.emit('message-resolved', data);
+      });
+
+      // Handle message cancelled action from dashboard screen
+      socket.on('cancel-message', (data) => {
+        // Broadcast to all clients (especially catering screen)
+        io.emit('message-cancelled', data);
       });
 
       // Handle reset action
       socket.on('reset-system', () => {
-        console.log('System reset triggered');
         io.emit('system-reset');
       });
 

@@ -1,105 +1,71 @@
 'use client';
 
-import { useState } from 'react';
+import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Controller } from '@/components/Controller';
-import { Display } from '@/components/Display';
-import { useSocket } from '@/hooks/useSocket';
-import { useStore } from '@/store/useStore';
-import { Monitor, Gamepad2, Wifi, WifiOff, RotateCcw } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Monitor, Tablet } from 'lucide-react';
 
-export default function RoomControl() {
-  const [activeTab, setActiveTab] = useState<'controller' | 'display'>('controller');
-  
-  // Initialize socket connection and get status
-  const { isConnected, emitReset } = useSocket();
-  const { activeRoomState, isResetting, triggerReset, setIsResetting } = useStore();
-
-  const handleReset = () => {
-    setIsResetting(true);
-    emitReset();
-    triggerReset(); // This will clear both room state and clicked actions
-  };
-
+export default function HomePage() {
   return (
-    <div className="h-screen bg-gray-50 flex flex-col overflow-hidden" style={{height: '100vh', maxHeight: '100vh'}}>
-      {/* Tab Navigation with Status - Smaller fixed height */}
-      <div className="bg-white border-b border-gray-200 flex-shrink-0 shadow-sm" style={{height: '56px', minHeight: '56px', maxHeight: '56px'}}>
-        <div className="max-w-7xl mx-auto px-0 h-full">
-          <div className="flex items-center justify-between py-1 sm:py-2 h-full">
-            {/* Left: Reset Button (subtle) - Hugging left edge */}
-            <div className="flex items-center pl-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleReset}
-                disabled={!isConnected || isResetting}
-                className="gap-1 text-gray-500 hover:text-gray-700 opacity-80 hover:opacity-100 cursor-pointer text-xs"
-              >
-                <RotateCcw className={`w-3 h-3 ${isResetting ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline text-xs">Reset</span>
-              </Button>
-            </div>
-
-            {/* Center: Tab Navigation - Fixed positioning */}
-            <div className="flex space-x-2">
-              <Button
-                variant={activeTab === 'controller' ? 'default' : 'ghost'}
-                size="lg"
-                onClick={() => setActiveTab('controller')}
-                className={`gap-2 cursor-pointer text-sm sm:text-base px-3 sm:px-4 py-2 ${
-                  activeTab === 'controller' 
-                    ? 'bg-[var(--pink-accent)] hover:bg-[var(--pink-accent)]/90 text-white' 
-                    : 'text-gray-700 hover:text-[var(--pink-accent)]'
-                }`}
-              >
-                <Gamepad2 className="w-4 h-4" />
-                <span className="font-semibold">Controller</span>
-              </Button>
-              <Button
-                variant={activeTab === 'display' ? 'default' : 'ghost'}
-                size="lg"
-                onClick={() => setActiveTab('display')}
-                className={`gap-2 cursor-pointer text-sm sm:text-base px-3 sm:px-4 py-2 ${
-                  activeTab === 'display' 
-                    ? 'bg-[var(--pink-accent)] hover:bg-[var(--pink-accent)]/90 text-white' 
-                    : 'text-gray-700 hover:text-[var(--pink-accent)]'
-                }`}
-              >
-                <Monitor className="w-4 h-4" />
-                <span className="font-semibold">Display</span>
-              </Button>
-            </div>
-
-            {/* Right: Connection Status and Active State (subtle) - Hugging right edge */}
-            <div className="flex items-center gap-1 sm:gap-2 pr-2">
-              {activeRoomState && (
-                <Badge variant="outline" className="text-xs bg-[var(--pink-accent)]/10 text-[var(--pink-accent)] border-[var(--pink-accent)]/20 hidden md:inline-flex">
-                  S{activeRoomState.replace('state', '')}
-                </Badge>
-              )}
-              
-              {isConnected ? (
-                <div className="flex items-center gap-1 opacity-80">
-                  <Wifi className="w-3 h-3 text-green-500" />
-                  <span className="text-xs text-green-600 hidden lg:inline">Connected</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1 opacity-80">
-                  <WifiOff className="w-3 h-3 text-red-500" />
-                  <span className="text-xs text-red-600 hidden lg:inline">Offline</span>
-                </div>
-              )}
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-6 flex items-center justify-center">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl w-full">
+        
+        {/* Dashboard A */}
+        <Card className="p-6 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-center mb-4">
+            <Monitor className="w-8 h-8 text-blue-600" />
           </div>
-        </div>
-      </div>
+          <h3 className="text-xl font-semibold mb-2 text-center">Dashboard A</h3>
+          <p className="text-gray-600 mb-4 text-center">Room 139</p>
+          <Link href="/dashboard-a">
+            <Button className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer">
+              Open Dashboard A
+            </Button>
+          </Link>
+        </Card>
 
-      {/* Tab Content - More space for content */}
-      <div className="flex-1 overflow-hidden" style={{height: 'calc(100vh - 56px)', maxHeight: 'calc(100vh - 56px)', minHeight: 'calc(100vh - 56px)'}}>
-        {activeTab === 'controller' && <Controller />}
-        {activeTab === 'display' && <Display />}
+        {/* Dashboard B */}
+        <Card className="p-6 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-center mb-4">
+            <Monitor className="w-8 h-8 text-pink-600" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2 text-center">Dashboard B</h3>
+          <p className="text-gray-600 mb-4 text-center">Room 143</p>
+          <Link href="/dashboard-b">
+            <Button className="w-full bg-pink-600 hover:bg-pink-700 cursor-pointer">
+              Open Dashboard B
+            </Button>
+          </Link>
+        </Card>
+
+        {/* Dashboard C */}
+        <Card className="p-6 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-center mb-4">
+            <Monitor className="w-8 h-8 text-green-600" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2 text-center">Dashboard C</h3>
+          <p className="text-gray-600 mb-4 text-center">Room 150</p>
+          <Link href="/dashboard-c">
+            <Button className="w-full bg-green-600 hover:bg-green-700 cursor-pointer">
+              Open Dashboard C
+            </Button>
+          </Link>
+        </Card>
+
+        {/* Catering Screen */}
+        <Card className="p-6 hover:shadow-lg transition-shadow">
+          <div className="flex items-center justify-center mb-4">
+            <Tablet className="w-8 h-8 text-orange-600" />
+          </div>
+          <h3 className="text-xl font-semibold mb-2 text-center">Catering Screen</h3>
+          <p className="text-gray-600 mb-4 text-center">Control Hub</p>
+          <Link href="/catering">
+            <Button className="w-full bg-orange-600 hover:bg-orange-700 cursor-pointer">
+              Open Catering Screen
+            </Button>
+          </Link>
+        </Card>
+
       </div>
     </div>
   );

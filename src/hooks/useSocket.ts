@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { useStore, RoomAction, RoomState } from '@/store/useStore';
+import { useStore, RoomId, MessageType } from '@/store/useStore';
 
 interface UseSocketReturn {
   isConnected: boolean;
-  emitRoomAction: (action: RoomAction) => void;
-  emitRoomStateChange: (state: RoomState) => void;
-  emitCustomMessage: (message: string) => void; // Add custom message emit function
+  emitMessage: (roomId: RoomId, roomNumber: string, type: MessageType, customText?: string) => void;
+  emitMessageSeen: (messageId: string) => void;
+  emitMessageResolved: (messageId: string, roomId?: RoomId) => void;
+  emitMessageCancelled: (messageId: string) => void;
   emitReset: () => void;
 }
 
@@ -15,64 +16,79 @@ export const useSocket = (): UseSocketReturn => {
   const [isConnected, setIsConnected] = useState(false);
   
   const { 
-    setActiveRoomState, 
-    setCustomMessage,
+    markMessageSeen,
+    markMessageResolved,
+    cancelMessage,
+    setRoomFlash,
     setIsConnected: setStoreConnected, 
-    setIsResetting 
+    setIsResetting,
+    resetSystem,
+    sendMessage
   } = useStore();
 
   useEffect(() => {
     // Initialize socket connection
-    socketRef.current = io();
+    socketRef.current = io(process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:3000', {
+      path: '/api/socket',
+    });
 
     // Connection event handlers
     socketRef.current.on('connect', () => {
-      console.log('Connected to server');
       setIsConnected(true);
       setStoreConnected(true);
     });
 
     socketRef.current.on('disconnect', () => {
-      console.log('Disconnected from server');
       setIsConnected(false);
       setStoreConnected(false);
     });
 
-    // Room state events
-    socketRef.current.on('room-state-change', (data: { state: RoomState }) => {
-      console.log('Room state changed:', data.state);
-      setActiveRoomState(data.state);
+    // Message event handlers
+    socketRef.current.on('message-sent', (data: { roomId: RoomId, roomNumber: string, type: MessageType, customText?: string, messageId: string }) => {
+      // Add the message to the store for all connected clients
+      // Use the messageId from the server to ensure all clients have the same message ID
+      sendMessage(data.roomId, data.roomNumber, data.type, data.customText, data.messageId);
+      setRoomFlash(data.roomId, true);
     });
 
-    // Custom message events
-    socketRef.current.on('custom-message', (data: { message: string }) => {
-      console.log('Custom message received:', data.message);
-      setCustomMessage(data.message);
-      setActiveRoomState('custom');
+    socketRef.current.on('message-seen', (data: { messageId: string }) => {
+      markMessageSeen(data.messageId);
+    });
+
+    socketRef.current.on('message-resolved', (data: { messageId: string, roomId: RoomId }) => {
+      markMessageResolved(data.messageId);
+      setRoomFlash(data.roomId, false);
+    });
+
+    socketRef.current.on('message-cancelled', (data: { messageId: string }) => {
+      cancelMessage(data.messageId);
     });
 
     socketRef.current.on('system-reset', () => {
-      console.log('System reset received');
-      setActiveRoomState(null);
+      resetSystem();
       setIsResetting(false);
     });
 
     return () => {
       socketRef.current?.disconnect();
     };
-  }, [setActiveRoomState, setCustomMessage, setStoreConnected, setIsResetting]);
+  }, [markMessageSeen, markMessageResolved, cancelMessage, setRoomFlash, setStoreConnected, setIsResetting, resetSystem, sendMessage]);
 
   // Emit functions
-  const emitRoomAction = (action: RoomAction) => {
-    socketRef.current?.emit('room-action', { action });
+  const emitMessage = (roomId: RoomId, roomNumber: string, type: MessageType, customText?: string) => {
+    socketRef.current?.emit('send-message', { roomId, roomNumber, type, customText });
   };
 
-  const emitRoomStateChange = (state: RoomState) => {
-    socketRef.current?.emit('room-state-change', { state });
+  const emitMessageSeen = (messageId: string) => {
+    socketRef.current?.emit('message-seen', { messageId });
   };
 
-  const emitCustomMessage = (message: string) => {
-    socketRef.current?.emit('custom-message', { message });
+  const emitMessageResolved = (messageId: string, roomId?: RoomId) => {
+    socketRef.current?.emit('message-resolved', { messageId, roomId });
+  };
+
+  const emitMessageCancelled = (messageId: string) => {
+    socketRef.current?.emit('cancel-message', { messageId });
   };
 
   const emitReset = () => {
@@ -81,9 +97,10 @@ export const useSocket = (): UseSocketReturn => {
 
   return {
     isConnected,
-    emitRoomAction,
-    emitRoomStateChange,
-    emitCustomMessage,
+    emitMessage,
+    emitMessageSeen,
+    emitMessageResolved,
+    emitMessageCancelled,
     emitReset,
   };
 }; 
