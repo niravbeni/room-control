@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useStore, RoomId, MessageType } from '@/store/useStore';
 import { useSocket } from '@/hooks/useSocket';
 
@@ -10,9 +10,9 @@ interface DashboardScreenProps {
 }
 
 export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, roomId }) => {
+  const [activeButton, setActiveButton] = useState<MessageType | null>(null);
   const [customMessage, setCustomMessage] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
-  const [activeButton, setActiveButton] = useState<MessageType | null>(null);
   
   const { 
     getLatestMessageForRoom,
@@ -27,12 +27,13 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
     return getLatestMessageForRoom(roomId);
   }, [getLatestMessageForRoom, roomId]);
   
-  // Reset active button when message is resolved
-  useEffect(() => {
-    if (latestMessage && latestMessage.status === 'resolved') {
-      setActiveButton(null);
-    }
-  }, [latestMessage]);
+  // Get latest custom message specifically
+  const latestCustomMessage = useMemo(() => {
+    const customMessages = messages.filter(msg => msg.roomId === roomId && msg.type === 'custom');
+    return customMessages.length > 0 ? customMessages[customMessages.length - 1] : null;
+  }, [messages, roomId]);
+  
+
   
   const handleButtonClick = (type: MessageType, customText?: string) => {
     const status = getMessageStatus(type);
@@ -48,30 +49,38 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
       return;
     }
     
+    // For custom messages, show input field
+    if (type === 'custom') {
+      setShowCustomInput(true);
+      return;
+    }
+    
     // Otherwise, send the message
     handleSendMessage(type, customText);
   };
 
   const handleSendMessage = (type: MessageType, customText?: string) => {
+    // Set active button for visual feedback
     setActiveButton(type);
+    
     // Only emit the message - the socket event handler will create the message in the store
     emitMessage(roomId, roomNumber, type, customText);
     
-    if (type === 'custom') {
-      setCustomMessage('');
-      setShowCustomInput(false);
-    }
-    
-    // Reset active state after a brief moment
+    // Reset active button after a brief moment
     setTimeout(() => setActiveButton(null), 200);
   };
   
-  const handleCustomMessage = () => {
-    if (showCustomInput && customMessage.trim()) {
-      handleButtonClick('custom', customMessage.trim());
-    } else {
-      setShowCustomInput(true);
+  const handleCustomMessageSend = () => {
+    if (customMessage.trim()) {
+      handleSendMessage('custom', customMessage.trim());
+      setCustomMessage('');
+      setShowCustomInput(false);
     }
+  };
+  
+  const handleCustomMessageCancel = () => {
+    setCustomMessage('');
+    setShowCustomInput(false);
   };
   
   const getMessageStatus = (messageType: MessageType) => {
@@ -107,27 +116,39 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
   };
 
   const getButtonClasses = (messageType: MessageType) => {
-    const isPressed = activeButton === messageType;
     const status = getMessageStatus(messageType);
+    const hasAnyActiveMessage = messages.some(msg => msg.roomId === roomId && (msg.status === 'sent' || msg.status === 'seen'));
+    const isThisButtonActive = status === 'sent' || status === 'seen';
+    const isDisabled = hasAnyActiveMessage && !isThisButtonActive;
+    
     const baseClasses = "w-full h-full text-white rounded-2xl flex flex-col items-center justify-center gap-4 text-2xl font-semibold shadow-lg transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
     
-    // Sent status - yellow border
+    // Get room-specific colors - all pink for now
+    const getRoomColors = () => {
+      return 'from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700';
+    };
+    
+    // Sent status - darker pink with yellow border
     if (status === 'sent') {
-      return `${baseClasses} bg-gradient-to-br from-pink-500 to-pink-600 border-4 border-yellow-400 hover:from-pink-600 hover:to-pink-700 hover:scale-[1.02] active:scale-[0.98]`;
+      return `${baseClasses} bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 border-4 border-yellow-400 hover:scale-[1.02] active:scale-[0.98]`;
     }
     
-    // Seen status - green border
+    // Seen status - darker pink with green border
     if (status === 'seen') {
-      return `${baseClasses} bg-gradient-to-br from-pink-500 to-pink-600 border-4 border-green-400 hover:from-pink-600 hover:to-pink-700 hover:scale-[1.02] active:scale-[0.98]`;
+      return `${baseClasses} bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 border-4 border-green-400 hover:scale-[1.02] active:scale-[0.98]`;
     }
     
-    // Pressed state
-    if (isPressed) {
-      return `${baseClasses} bg-gradient-to-br from-pink-700 to-pink-800 hover:from-pink-800 hover:to-pink-900 hover:scale-[1.02] active:scale-[0.98]`;
+    // Normal state (idle or resolved) - disabled if other button is active
+    if (isDisabled) {
+      return `${baseClasses} bg-gradient-to-br from-gray-400 to-gray-500 cursor-not-allowed opacity-50`;
     }
     
-    // Normal state (idle or resolved)
-    return `${baseClasses} bg-gradient-to-br from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 hover:scale-[1.02] active:scale-[0.98]`;
+    // Active button state - dark pink
+    if (activeButton === messageType) {
+      return `${baseClasses} bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 hover:scale-[1.02] active:scale-[0.98]`;
+    }
+    
+    return `${baseClasses} bg-gradient-to-br ${getRoomColors()} hover:scale-[1.02] active:scale-[0.98]`;
   };
 
   return (
@@ -149,7 +170,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
               <button
                 className={getButtonClasses('delay')}
                 onClick={() => handleButtonClick('delay')}
-                disabled={!isConnected}
+                disabled={!isConnected || (messages.some(msg => msg.roomId === roomId && (msg.status === 'sent' || msg.status === 'seen')) && getMessageStatus('delay') !== 'sent' && getMessageStatus('delay') !== 'seen')}
               >
                 <span className="text-6xl">⏰</span>
                 <span className="text-center leading-tight px-4">
@@ -164,7 +185,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
               <button
                 className={getButtonClasses('water')}
                 onClick={() => handleButtonClick('water')}
-                disabled={!isConnected}
+                disabled={!isConnected || (messages.some(msg => msg.roomId === roomId && (msg.status === 'sent' || msg.status === 'seen')) && getMessageStatus('water') !== 'sent' && getMessageStatus('water') !== 'seen')}
               >
                 <span className="text-6xl">💧</span>
                 <span className="text-center leading-tight px-4">
@@ -179,7 +200,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
               <button
                 className={getButtonClasses('cancel')}
                 onClick={() => handleButtonClick('cancel')}
-                disabled={!isConnected}
+                disabled={!isConnected || (messages.some(msg => msg.roomId === roomId && (msg.status === 'sent' || msg.status === 'seen')) && getMessageStatus('cancel') !== 'sent' && getMessageStatus('cancel') !== 'seen')}
               >
                 <span className="text-6xl">❌</span>
                 <span className="text-center leading-tight px-4">
@@ -192,26 +213,26 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
             {/* Custom Message Button */}
             <div className="relative h-full">
               {showCustomInput ? (
-                <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 border-4 border-dashed border-gray-400 rounded-2xl p-8 flex flex-col items-center justify-center gap-4">
+                <div className="w-full h-full bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl p-6 flex flex-col items-center justify-center gap-4">
                   <span className="text-5xl">✏️</span>
                   <input
                     value={customMessage}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomMessage(e.target.value)}
                     placeholder="Enter custom message..."
-                    className="w-full text-center text-lg px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-text"
-                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleCustomMessage()}
+                    className="w-full text-center text-lg px-4 py-3 border-2 border-white rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white cursor-text bg-white/20 text-white placeholder-white/70"
+                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleCustomMessageSend()}
                     autoFocus
                   />
                   <div className="flex gap-3">
                     <button
-                      onClick={handleCustomMessage}
+                      onClick={handleCustomMessageSend}
                       disabled={!customMessage.trim() || !isConnected}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      className="bg-white text-pink-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                       Send
                     </button>
                     <button
-                      onClick={() => setShowCustomInput(false)}
+                      onClick={handleCustomMessageCancel}
                       className="bg-gray-500 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold cursor-pointer"
                     >
                       Cancel
@@ -220,13 +241,16 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
                 </div>
               ) : (
                 <button
-                  className="w-full h-full bg-gradient-to-br from-gray-200 to-gray-300 hover:from-gray-300 hover:to-gray-400 text-gray-700 border-4 border-dashed border-gray-400 rounded-2xl flex flex-col items-center justify-center gap-4 text-xl font-semibold transition-all duration-150 hover:scale-[1.02] active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => setShowCustomInput(true)}
-                  disabled={!isConnected}
+                  className={getButtonClasses('custom')}
+                  onClick={() => handleButtonClick('custom')}
+                  disabled={!isConnected || (messages.some(msg => msg.roomId === roomId && (msg.status === 'sent' || msg.status === 'seen')) && getMessageStatus('custom') !== 'sent' && getMessageStatus('custom') !== 'seen')}
                 >
                   <span className="text-6xl">✏️</span>
                   <span className="text-center leading-tight px-4">
-                    Custom message
+                    {latestCustomMessage && latestCustomMessage.customText 
+                      ? latestCustomMessage.customText 
+                      : 'Custom message'
+                    }
                   </span>
                 </button>
               )}

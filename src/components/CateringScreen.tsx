@@ -12,6 +12,7 @@ export const CateringScreen: React.FC = () => {
     roomFlashStates,
     selectMessage,
     getSelectedMessage,
+    hasActiveMessage,
     isConnected
   } = useStore();
   
@@ -91,18 +92,28 @@ export const CateringScreen: React.FC = () => {
     <div className="h-screen w-full flex flex-col">
       {/* Map Section - Top area (White background) */}
       <div className="h-[50%] bg-white flex flex-col items-center justify-center relative p-4">
-        {/* Connection Status Indicator - Top right */}
-        <div className="absolute top-4 right-4">
+        {/* Connection Status Indicator - Bottom right */}
+        <div className="absolute bottom-4 right-4">
           <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
         </div>
 
         {/* Room Navigation Buttons - Positioned above the map */}
-        <div className="mb-4 flex gap-4">
+        <div className="mb-4 flex gap-4 w-full">
           {roomButtons.map((room) => {
-            const messageCount = getMessageCount(room.id);
-            const hasMessages = messageCount > 0;
-            const isFlashing = roomFlashStates[room.id];
+            const hasMessages = hasActiveMessage(room.id);
             const isSelected = selectedMessage && selectedMessage.roomId === room.id;
+            
+            // Color coding based on room
+            const getRoomColor = (roomId: string) => {
+              switch (roomId) {
+                case 'dashboard-a': return 'bg-blue-600 hover:bg-blue-700';
+                case 'dashboard-b': return 'bg-orange-600 hover:bg-orange-700';
+                case 'dashboard-c': return 'bg-green-600 hover:bg-green-700';
+                default: return 'bg-gray-600 hover:bg-gray-700';
+              }
+            };
+            
+
             
             return (
               <button
@@ -110,20 +121,16 @@ export const CateringScreen: React.FC = () => {
                 onClick={() => handleRoomClick(room.id)}
                 disabled={!hasMessages}
                 className={`
-                  relative px-4 py-2 rounded-lg font-medium text-white transition-all duration-300 text-sm cursor-pointer
+                  relative px-6 py-3 rounded-lg font-medium text-white text-base cursor-pointer flex-1
                   ${hasMessages 
-                    ? 'bg-blue-500 hover:bg-blue-600' 
+                    ? getRoomColor(room.id)
                     : 'bg-gray-400 cursor-not-allowed opacity-50'
                   }
-                  ${isSelected ? 'bg-blue-700' : ''}
-                  ${isFlashing ? 'animate-pulse bg-green-500 hover:bg-green-600' : ''}
                 `}
               >
                 {room.label}
-                {messageCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                    {messageCount}
-                  </span>
+                {hasMessages && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 rounded-full h-3 w-3"></span>
                 )}
               </button>
             );
@@ -133,7 +140,7 @@ export const CateringScreen: React.FC = () => {
         {/* Layered SVG Map System */}
         <div className="flex items-center justify-center">
           {/* Container with fixed aspect ratio to ensure perfect alignment */}
-          <div className="relative w-[400px] h-[300px] max-w-full max-h-full">
+          <div className="relative w-[500px] h-[375px] max-w-full max-h-full">
             {/* Base Map Layer */}
             <Image
               src="/map.svg"
@@ -195,8 +202,13 @@ export const CateringScreen: React.FC = () => {
       {/* Content Section */}
       {selectedMessage ? (
         <>
-          {/* Room Number Section - Light pink background */}
-          <div className="bg-pink-400 py-6 text-center">
+          {/* Room Number Section - Color matches selected room */}
+          <div className={`py-6 text-center ${
+            selectedMessage.roomId === 'dashboard-a' ? 'bg-blue-600' :
+            selectedMessage.roomId === 'dashboard-b' ? 'bg-orange-600' :
+            selectedMessage.roomId === 'dashboard-c' ? 'bg-green-600' :
+            'bg-pink-600'
+          }`}>
             <h1 className="text-4xl font-bold text-white">
               Room No {roomNumberMap[selectedMessage.roomId]}
             </h1>
@@ -212,11 +224,11 @@ export const CateringScreen: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-6 mb-4">
+            <div className="flex gap-8 mb-4 w-full px-8">
               <button
                 onClick={handleSeen}
                 disabled={!isConnected || selectedMessage.status === 'seen'}
-                className="px-8 py-4 text-lg font-semibold bg-black text-white rounded-2xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-w-[160px] h-[60px] flex items-center justify-center gap-3 transition-all"
+                className="px-12 py-6 text-xl font-semibold bg-black text-white rounded-2xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex-1 h-[80px] flex items-center justify-center gap-3 transition-all"
               >
                 <Image src="/eye.png" alt="Eye" width={24} height={24} className="w-6 h-6" />
                 Seen
@@ -225,7 +237,7 @@ export const CateringScreen: React.FC = () => {
               <button
                 onClick={handleResolved}
                 disabled={!isConnected}
-                className="px-8 py-4 text-lg font-semibold bg-white text-black rounded-2xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer min-w-[160px] h-[60px] flex items-center justify-center gap-3 transition-all"
+                className="px-12 py-6 text-xl font-semibold bg-white text-black rounded-2xl hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex-1 h-[80px] flex items-center justify-center gap-3 transition-all"
               >
                 <Image src="/resolved.png" alt="Resolve" width={24} height={24} className="w-6 h-6" />
                 Resolved

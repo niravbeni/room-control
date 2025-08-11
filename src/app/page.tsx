@@ -7,11 +7,11 @@ import { Monitor, Tablet } from 'lucide-react';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-6 flex items-center justify-center">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl w-full">
+    <div className="h-screen w-full bg-gradient-to-br from-purple-50 to-pink-50 p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 h-full w-full gap-6">
         
         {/* Dashboard A */}
-        <Card className="p-6 hover:shadow-lg transition-shadow">
+        <Card className="h-full w-full rounded-2xl border-2 border-gray-200 hover:shadow-lg transition-shadow flex flex-col justify-center items-center p-6">
           <div className="flex items-center justify-center mb-4">
             <Monitor className="w-8 h-8 text-blue-600" />
           </div>
@@ -25,21 +25,21 @@ export default function HomePage() {
         </Card>
 
         {/* Dashboard B */}
-        <Card className="p-6 hover:shadow-lg transition-shadow">
+        <Card className="h-full w-full rounded-2xl border-2 border-gray-200 hover:shadow-lg transition-shadow flex flex-col justify-center items-center p-6">
           <div className="flex items-center justify-center mb-4">
-            <Monitor className="w-8 h-8 text-pink-600" />
+            <Monitor className="w-8 h-8 text-orange-600" />
           </div>
           <h3 className="text-xl font-semibold mb-2 text-center">Dashboard B</h3>
           <p className="text-gray-600 mb-4 text-center">Room 143</p>
           <Link href="/dashboard-b">
-            <Button className="w-full bg-pink-600 hover:bg-pink-700 cursor-pointer">
+            <Button className="w-full bg-orange-600 hover:bg-orange-700 cursor-pointer">
               Open Dashboard B
             </Button>
           </Link>
         </Card>
 
         {/* Dashboard C */}
-        <Card className="p-6 hover:shadow-lg transition-shadow">
+        <Card className="h-full w-full rounded-2xl border-2 border-gray-200 hover:shadow-lg transition-shadow flex flex-col justify-center items-center p-6">
           <div className="flex items-center justify-center mb-4">
             <Monitor className="w-8 h-8 text-green-600" />
           </div>
@@ -53,14 +53,14 @@ export default function HomePage() {
         </Card>
 
         {/* Catering Screen */}
-        <Card className="p-6 hover:shadow-lg transition-shadow">
+        <Card className="h-full w-full rounded-2xl border-2 border-gray-200 hover:shadow-lg transition-shadow flex flex-col justify-center items-center p-6">
           <div className="flex items-center justify-center mb-4">
-            <Tablet className="w-8 h-8 text-orange-600" />
+            <Tablet className="w-8 h-8 text-pink-600" />
           </div>
           <h3 className="text-xl font-semibold mb-2 text-center">Catering Screen</h3>
           <p className="text-gray-600 mb-4 text-center">Control Hub</p>
           <Link href="/catering">
-            <Button className="w-full bg-orange-600 hover:bg-orange-700 cursor-pointer">
+            <Button className="w-full bg-pink-600 hover:bg-pink-700 cursor-pointer">
               Open Catering Screen
             </Button>
           </Link>

@@ -51,6 +51,7 @@ interface RoomStore {
   getMessagesByRoom: (roomId: RoomId) => Message[];
   getLatestMessageForRoom: (roomId: RoomId) => Message | null;
   getSelectedMessage: () => Message | null;
+  hasActiveMessage: (roomId: RoomId) => boolean;
 }
 
 // Helper function to get message content based on type
@@ -91,11 +92,17 @@ export const useStore = create<RoomStore>((set, get) => ({
       status: 'sent',
     };
     
-    set((state) => ({
-      messages: [...state.messages, message],
-      activeMessages: [...state.activeMessages, message],
-      roomFlashStates: { ...state.roomFlashStates, [roomId]: true }
-    }));
+    set((state) => {
+      // Remove any existing message for this room
+      const filteredMessages = state.messages.filter(m => m.roomId !== roomId);
+      const filteredActiveMessages = state.activeMessages.filter(m => m.roomId !== roomId);
+      
+      return {
+        messages: [...filteredMessages, message],
+        activeMessages: [...filteredActiveMessages, message],
+        roomFlashStates: { ...state.roomFlashStates, [roomId]: true }
+      };
+    });
   },
   
   markMessageSeen: (messageId) => {
@@ -183,5 +190,9 @@ export const useStore = create<RoomStore>((set, get) => ({
   getSelectedMessage: () => {
     const { messages, selectedMessageId } = get();
     return selectedMessageId ? messages.find(msg => msg.id === selectedMessageId) || null : null;
+  },
+  
+  hasActiveMessage: (roomId) => {
+    return get().activeMessages.some(msg => msg.roomId === roomId);
   },
 })); 
