@@ -4,10 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:server": "node server.cjs",
     "build": "next build",
-    "start": "NODE_ENV=production node server.cjs",
-    "start:next": "next start",
+    "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
