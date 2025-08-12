@@ -155,7 +155,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
       </div>
       
       {/* Message Buttons Container - Full remaining height */}
-      <div className="flex-1 p-4 pb-8">
+      <div className="flex-1 p-4 pb-16">
         <div className="h-full w-full">
           <div className="grid grid-cols-2 gap-3 h-full w-full">
             
