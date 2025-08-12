@@ -214,7 +214,7 @@ export const CateringScreen: React.FC = () => {
           </div>
 
           {/* Message Content and Buttons Section - Dark pink background */}
-          <div className="bg-pink-600 flex flex-col items-center justify-center py-8 px-8 flex-1 ipad-ultra-safe">
+          <div className="bg-pink-600 flex flex-col items-center justify-center py-8 px-8 flex-1">
             {/* Message Content */}
             <div className="text-center mb-8 flex-1 flex items-center justify-center">
               <h2 className="text-5xl font-bold text-white leading-tight max-w-4xl">
@@ -223,7 +223,7 @@ export const CateringScreen: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-8 mb-16 w-full px-8">
+            <div className="flex gap-8 mb-4 w-full px-8">
               <button
                 onClick={handleSeen}
                 disabled={!isConnected || selectedMessage.status === 'seen'}
