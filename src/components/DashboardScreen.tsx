@@ -15,17 +15,11 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
   const [showCustomInput, setShowCustomInput] = useState(false);
   
   const { 
-    getLatestMessageForRoom,
     isConnected,
     messages // Subscribe to messages array to trigger re-renders
   } = useStore();
   
   const { emitMessage, emitMessageCancelled } = useSocket();
-  
-  // Get latest message and make it reactive to messages changes
-  const latestMessage = useMemo(() => {
-    return getLatestMessageForRoom(roomId);
-  }, [getLatestMessageForRoom, roomId]);
   
   // Get latest custom message specifically
   const latestCustomMessage = useMemo(() => {

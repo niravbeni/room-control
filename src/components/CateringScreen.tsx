@@ -91,17 +91,16 @@ export const CateringScreen: React.FC = () => {
   return (
     <div className="h-screen w-full flex flex-col">
       {/* Map Section - Top area (White background) */}
-      <div className="h-[50%] bg-white flex flex-col items-center justify-center relative p-4">
+      <div className="min-h-[400px] bg-white flex flex-col items-center justify-center relative p-6">
         {/* Connection Status Indicator - Bottom right */}
         <div className="absolute bottom-4 right-4">
           <div className={`w-4 h-4 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`}></div>
         </div>
 
         {/* Room Navigation Buttons - Positioned above the map */}
-        <div className="mb-4 flex gap-4 w-full">
+        <div className="mb-6 flex gap-4 w-full px-4">
           {roomButtons.map((room) => {
             const hasMessages = hasActiveMessage(room.id);
-            const isSelected = selectedMessage && selectedMessage.roomId === room.id;
             
             // Color coding based on room
             const getRoomColor = (roomId: string) => {
@@ -121,7 +120,7 @@ export const CateringScreen: React.FC = () => {
                 onClick={() => handleRoomClick(room.id)}
                 disabled={!hasMessages}
                 className={`
-                  relative px-6 py-3 rounded-lg font-medium text-white text-base cursor-pointer flex-1
+                  relative px-6 py-4 rounded-lg font-medium text-white text-base cursor-pointer flex-1
                   ${hasMessages 
                     ? getRoomColor(room.id)
                     : 'bg-gray-400 cursor-not-allowed opacity-50'
@@ -138,7 +137,7 @@ export const CateringScreen: React.FC = () => {
         </div>
 
         {/* Layered SVG Map System */}
-        <div className="flex items-center justify-center">
+        <div className="flex items-center justify-center flex-1">
           {/* Container with fixed aspect ratio to ensure perfect alignment */}
           <div className="relative w-[500px] h-[375px] max-w-full max-h-full">
             {/* Base Map Layer */}
