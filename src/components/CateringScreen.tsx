@@ -89,7 +89,7 @@ export const CateringScreen: React.FC = () => {
   const hasRoomCMessages = getMessageCount('dashboard-c') > 0;
 
   return (
-    <div className="h-screen w-full flex flex-col">
+    <div className="min-h-screen w-full flex flex-col ipad-ultra-safe">
       {/* Map Section - Top area (White background) */}
       <div className="min-h-[400px] bg-white flex flex-col items-center justify-center relative p-6">
         {/* Connection Status Indicator - Bottom right */}
