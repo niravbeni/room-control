@@ -146,21 +146,21 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
   };
 
   return (
-    <div className="min-h-screen w-full bg-white flex flex-col ipad-ultra-safe">
+    <div className="h-screen w-full bg-white flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="pt-6 pb-3 px-6 text-center flex-shrink-0">
+      <div className="py-4 px-6 text-center flex-shrink-0">
         <h1 className="text-3xl font-normal text-black">
           Send quick messages to the catering
         </h1>
       </div>
       
       {/* Message Buttons Container - Full remaining height */}
-      <div className="flex-1 p-4">
-        <div className="h-full">
-          <div className="grid grid-cols-2 gap-3 h-full">
+      <div className="flex-1 p-4 pb-8">
+        <div className="h-full w-full">
+          <div className="grid grid-cols-2 gap-3 h-full w-full">
             
             {/* Delay Service Button */}
-            <div className="relative h-full">
+            <div className="relative">
               <button
                 className={getButtonClasses('delay')}
                 onClick={() => handleButtonClick('delay')}
@@ -175,7 +175,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
             </div>
 
             {/* Water Bottles Button */}
-            <div className="relative h-full">
+            <div className="relative">
               <button
                 className={getButtonClasses('water')}
                 onClick={() => handleButtonClick('water')}
@@ -190,7 +190,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
             </div>
 
             {/* Cancel Coffee Button */}
-            <div className="relative h-full">
+            <div className="relative">
               <button
                 className={getButtonClasses('cancel')}
                 onClick={() => handleButtonClick('cancel')}
@@ -205,7 +205,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
             </div>
 
             {/* Custom Message Button */}
-            <div className="relative h-full">
+            <div className="relative">
               {showCustomInput ? (
                 <div className="w-full h-full bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl p-6 flex flex-col items-center justify-center gap-4">
                   <span className="text-5xl">✏️</span>
