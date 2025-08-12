@@ -223,7 +223,7 @@ export const CateringScreen: React.FC = () => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-8 mb-8 w-full px-8">
+            <div className="flex gap-8 mb-16 w-full px-8">
               <button
                 onClick={handleSeen}
                 disabled={!isConnected || selectedMessage.status === 'seen'}
