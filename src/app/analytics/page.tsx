@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase, type MessageFlow, type CustomMessage, type ButtonCancellation } from '@/lib/supabase'
+import { supabase, type MessageFlow, type CustomMessage } from '@/lib/supabase'
 import { useAnalytics } from '@/hooks/useAnalytics'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -25,7 +25,6 @@ const analyticsPageStyles = `
 export default function AnalyticsPage() {
   const [messageFlows, setMessageFlows] = useState<MessageFlow[]>([])
   const [customMessages, setCustomMessages] = useState<CustomMessage[]>([])
-  const [buttonCancellations, setButtonCancellations] = useState<ButtonCancellation[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedDate, setSelectedDate] = useState<string>(
     new Date().toISOString().split('T')[0]
@@ -36,44 +35,32 @@ export default function AnalyticsPage() {
   const [resettingCustom, setResettingCustom] = useState(false)
   const [totalRecords, setTotalRecords] = useState(0)
   const [totalCustomMessages, setTotalCustomMessages] = useState(0)
-  const [totalCancellations, setTotalCancellations] = useState(0)
-  const [activeTab, setActiveTab] = useState<'analytics' | 'custom' | 'cancellations'>('analytics')
+  const [activeTab, setActiveTab] = useState<'analytics' | 'custom'>('analytics')
 
   const { 
     resetAnalyticsData, 
     getAnalyticsCount, 
     getCustomMessages, 
     getCustomMessagesCount, 
-    resetCustomMessages,
-    getButtonCancellations,
-    getButtonCancellationsCount,
-    resetButtonCancellations
+    resetCustomMessages
   } = useAnalytics()
 
   useEffect(() => {
     loadAnalytics()
     loadCustomMessages()
-    loadCancellations()
     loadTotalRecords()
   }, [selectedDate])
 
   const loadTotalRecords = async () => {
     const count = await getAnalyticsCount()
     const customCount = await getCustomMessagesCount()
-    const cancellationCount = await getButtonCancellationsCount()
     setTotalRecords(count)
     setTotalCustomMessages(customCount)
-    setTotalCancellations(cancellationCount)
   }
 
   const loadCustomMessages = async () => {
     const messages = await getCustomMessages(selectedDate)
     setCustomMessages(messages)
-  }
-
-  const loadCancellations = async () => {
-    const cancellations = await getButtonCancellations(selectedDate)
-    setButtonCancellations(cancellations)
   }
 
   const loadAnalytics = async () => {
@@ -205,47 +192,6 @@ export default function AnalyticsPage() {
     window.URL.revokeObjectURL(url)
   }
 
-  const exportCancellationsToCSV = () => {
-    const headers = [
-      'Date',
-      'Time Sent',
-      'Time Cancelled',
-      'Room ID',
-      'Room Name',
-      'Button Type',
-      'Button Label',
-      'Seconds Before Cancel',
-      'Cancel Type',
-      'Custom Text'
-    ]
-
-    const csvData = buttonCancellations.map(cancel => [
-      cancel.date,
-      new Date(cancel.sent_timestamp).toLocaleTimeString(),
-      new Date(cancel.cancelled_timestamp).toLocaleTimeString(),
-      cancel.room_id,
-      cancel.room_name,
-      cancel.button_type,
-      cancel.button_label,
-      cancel.seconds_before_cancellation,
-      cancel.seconds_before_cancellation <= 5 ? 'Quick Mistake' : 
-      cancel.seconds_before_cancellation <= 30 ? 'Hesitation' : 'Changed Mind',
-      cancel.custom_text || ''
-    ])
-
-    const csvContent = [headers, ...csvData]
-      .map(row => row.map(field => `"${field}"`).join(','))
-      .join('\n')
-
-    const blob = new Blob([csvContent], { type: 'text/csv' })
-    const url = window.URL.createObjectURL(blob)
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `button-cancellations-${selectedDate}.csv`
-    link.click()
-    window.URL.revokeObjectURL(url)
-  }
-
   const getRoomStats = () => {
     const stats = {
       'dashboard-a': { total: 0, completed: 0, avgTime: 0 },
@@ -324,8 +270,7 @@ export default function AnalyticsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Room Control Analytics</h1>
             <div className="text-sm text-gray-600">
               Analytics: <span className="font-semibold">{totalRecords}</span> | 
-              Custom Messages: <span className="font-semibold">{totalCustomMessages}</span> |
-              Cancellations: <span className="font-semibold">{totalCancellations}</span>
+              Custom Messages: <span className="font-semibold">{totalCustomMessages}</span>
             </div>
           </div>
 
@@ -350,16 +295,6 @@ export default function AnalyticsPage() {
               }`}
             >
               Custom Messages ({customMessages.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('cancellations')}
-              className={`px-4 py-2 rounded-lg font-medium cursor-pointer transition-colors ${
-                activeTab === 'cancellations' 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-              }`}
-            >
-              Cancellations ({buttonCancellations.length})
             </button>
           </div>
           
@@ -392,7 +327,7 @@ export default function AnalyticsPage() {
                     Reset Analytics
                   </Button>
                 </>
-              ) : activeTab === 'custom' ? (
+              ) : (
                 <>
                   <Button onClick={exportCustomMessagesToCSV} disabled={customMessages.length === 0} className="cursor-pointer">
                     Export Custom Messages CSV
@@ -404,20 +339,6 @@ export default function AnalyticsPage() {
                     className="cursor-pointer"
                   >
                     Reset Custom Messages
-                  </Button>
-                </>
-              ) : (
-                <>
-                  <Button onClick={exportCancellationsToCSV} disabled={buttonCancellations.length === 0} className="cursor-pointer">
-                    Export Cancellations CSV
-                  </Button>
-                  <Button 
-                    onClick={() => setShowResetDialog(true)} 
-                    disabled={totalCancellations === 0}
-                    variant="destructive"
-                    className="cursor-pointer"
-                  >
-                    Reset Cancellations
                   </Button>
                 </>
               )}
@@ -462,40 +383,6 @@ export default function AnalyticsPage() {
                 </Card>
               ))}
             </div>
-
-            {/* Button Performance */}
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle>Button Performance</CardTitle>
-                <CardDescription>Performance by message type</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left py-2">Button</th>
-                        <th className="text-left py-2">Total Clicks</th>
-                        <th className="text-left py-2">Completed</th>
-                        <th className="text-left py-2">Completion Rate</th>
-                        <th className="text-left py-2">Avg Resolution Time</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {buttonStats.map((stat) => (
-                        <tr key={stat.type} className="border-b">
-                          <td className="py-2 font-medium">{stat.label}</td>
-                          <td className="py-2">{stat.total}</td>
-                          <td className="py-2">{stat.completed}</td>
-                          <td className="py-2">{stat.completionRate}%</td>
-                          <td className="py-2">{formatTime(stat.avgTime)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
 
             {/* Individual Button Events */}
             <Card className="mb-8">
@@ -637,7 +524,7 @@ export default function AnalyticsPage() {
               </CardContent>
             </Card>
           </>
-        ) : activeTab === 'custom' ? (
+        ) : (
           <>
             {/* Custom Messages View */}
             <Card>
@@ -666,74 +553,6 @@ export default function AnalyticsPage() {
                         </div>
                       </div>
                     ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </>
-        ) : (
-          <>
-            {/* Button Cancellations View */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Button Cancellations</CardTitle>
-                <CardDescription>Buttons that were clicked then immediately cancelled for {selectedDate}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {buttonCancellations.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">No button cancellations found for this date.</p>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-sm">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left py-2">Time Sent</th>
-                          <th className="text-left py-2">Time Cancelled</th>
-                          <th className="text-left py-2">Room</th>
-                          <th className="text-left py-2">Button</th>
-                          <th className="text-left py-2">Seconds Before Cancel</th>
-                          <th className="text-left py-2">Custom Text</th>
-                          <th className="text-left py-2">Cancel Type</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {buttonCancellations.map((cancellation) => (
-                          <tr key={cancellation.id} className="border-b hover:bg-gray-50">
-                            <td className="py-2 font-mono">
-                              {new Date(cancellation.sent_timestamp).toLocaleTimeString()}
-                            </td>
-                            <td className="py-2 font-mono">
-                              {new Date(cancellation.cancelled_timestamp).toLocaleTimeString()}
-                            </td>
-                            <td className="py-2 font-medium">{cancellation.room_name}</td>
-                            <td className="py-2">{cancellation.button_label}</td>
-                            <td className="py-2 font-medium">
-                              <span className={`${
-                                cancellation.seconds_before_cancellation <= 5 ? 'text-red-600' : 
-                                cancellation.seconds_before_cancellation <= 30 ? 'text-orange-600' : 
-                                'text-blue-600'
-                              }`}>
-                                {cancellation.seconds_before_cancellation}s
-                              </span>
-                            </td>
-                            <td className="py-2 max-w-xs truncate text-gray-600">
-                              {cancellation.custom_text || '-'}
-                            </td>
-                            <td className="py-2">
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                cancellation.seconds_before_cancellation <= 5 ? 'bg-red-100 text-red-800' : 
-                                cancellation.seconds_before_cancellation <= 30 ? 'bg-orange-100 text-orange-800' : 
-                                'bg-blue-100 text-blue-800'
-                              }`}>
-                                {cancellation.seconds_before_cancellation <= 5 ? 'Quick Mistake' : 
-                                 cancellation.seconds_before_cancellation <= 30 ? 'Hesitation' : 
-                                 'Changed Mind'}
-                              </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
                   </div>
                 )}
               </CardContent>
