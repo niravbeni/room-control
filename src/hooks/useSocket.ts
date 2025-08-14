@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useStore, RoomId, MessageType } from '@/store/useStore';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 interface UseSocketReturn {
   isConnected: boolean;
@@ -26,6 +27,8 @@ export const useSocket = (): UseSocketReturn => {
     sendMessage
   } = useStore();
 
+  const { trackButtonClick, trackMessageSeen, trackMessageResolved, trackMessageCancelled } = useAnalytics();
+
   useEffect(() => {
     // Initialize socket connection
     socketRef.current = io(process.env.NODE_ENV === 'production' ? undefined : 'http://localhost:3000', {
@@ -49,19 +52,28 @@ export const useSocket = (): UseSocketReturn => {
       // Use the messageId from the server to ensure all clients have the same message ID
       sendMessage(data.roomId, data.roomNumber, data.type, data.customText, data.messageId);
       setRoomFlash(data.roomId, true);
+      
+      // Track analytics with the correct message ID
+      trackButtonClick(data.messageId, data.roomId, data.type, data.customText);
     });
 
     socketRef.current.on('message-seen', (data: { messageId: string }) => {
       markMessageSeen(data.messageId);
+      // Track analytics
+      trackMessageSeen(data.messageId);
     });
 
     socketRef.current.on('message-resolved', (data: { messageId: string, roomId: RoomId }) => {
       markMessageResolved(data.messageId);
       setRoomFlash(data.roomId, false);
+      // Track analytics
+      trackMessageResolved(data.messageId);
     });
 
     socketRef.current.on('message-cancelled', (data: { messageId: string }) => {
       cancelMessage(data.messageId);
+      // Track analytics
+      trackMessageCancelled(data.messageId);
     });
 
     socketRef.current.on('system-reset', () => {
@@ -72,7 +84,7 @@ export const useSocket = (): UseSocketReturn => {
     return () => {
       socketRef.current?.disconnect();
     };
-  }, [markMessageSeen, markMessageResolved, cancelMessage, setRoomFlash, setStoreConnected, setIsResetting, resetSystem, sendMessage]);
+  }, [markMessageSeen, markMessageResolved, cancelMessage, setRoomFlash, setStoreConnected, setIsResetting, resetSystem, sendMessage, trackButtonClick, trackMessageSeen, trackMessageResolved, trackMessageCancelled]);
 
   // Emit functions
   const emitMessage = (roomId: RoomId, roomNumber: string, type: MessageType, customText?: string) => {
