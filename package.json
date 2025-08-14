@@ -1,4 +1,5 @@
 {
+  "_comment": "Railway deployment fix for environment variables",
   "name": "room-control",
   "version": "0.1.0",
   "private": true,
