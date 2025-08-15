@@ -12,9 +12,9 @@ export const useAnalytics = () => {
     customText?: string
   ) => {
     const buttonLabels = {
-      delay: 'Delay Service',
-      water: 'Water Bottles', 
-      cancel: 'Cancel Order',
+      delay: 'Do Not Disturb For 10min',
+      water: 'Refill Water', 
+      cancel: 'Refill Fridge & Snacks',
       custom: 'Custom Message'
     }
 

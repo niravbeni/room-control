@@ -58,13 +58,13 @@ interface RoomStore {
 function getMessageContent(type: MessageType, customText?: string): string {
   switch (type) {
     case 'delay':
-      return 'Delay the service by 15mins';
+      return 'Do Not Disturb for 10min';
     case 'water':
-      return 'Bring new water bottles';
+      return 'Refill Water';
     case 'cancel':
-      return 'Cancel the coffee order';
+      return 'Refill Fridge & Snacks';
     case 'custom':
-      return customText || 'Custom message';
+      return customText || 'Custom Message';
     default:
       return 'Unknown message';
   }

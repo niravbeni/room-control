@@ -37,15 +37,15 @@ export const CateringScreen: React.FC = () => {
   // Format message content with time calculation for delay messages
   const formatMessageContent = (message: { type: string; timestamp: number; content: string }) => {
     if (message.type === 'delay') {
-      // Calculate time 15 minutes from message timestamp
+      // Calculate time 10 minutes from message timestamp
       const messageTime = new Date(message.timestamp);
-      const delayTime = new Date(messageTime.getTime() + 15 * 60 * 1000);
-      const timeString = delayTime.toLocaleTimeString([], { 
+      const endTime = new Date(messageTime.getTime() + 10 * 60 * 1000);
+      const timeString = endTime.toLocaleTimeString([], { 
         hour: '2-digit', 
         minute: '2-digit',
         hour12: false 
       });
-      return `Delay service for ${timeString}`;
+      return `Do Not Disturb Until ${timeString}`;
     }
     return message.content;
   };
@@ -217,7 +217,11 @@ export const CateringScreen: React.FC = () => {
           <div className="bg-pink-600 flex flex-col items-center justify-center py-8 px-8 flex-1">
             {/* Message Content */}
             <div className="text-center mb-8 flex-1 flex items-center justify-center">
-              <h2 className="text-5xl font-bold text-white leading-tight max-w-4xl">
+              <h2 className={`font-bold text-white leading-tight max-w-4xl ${
+                selectedMessage.type === 'custom' && selectedMessage.content.length > 50 
+                  ? 'text-3xl' 
+                  : 'text-5xl'
+              }`}>
                 {formatMessageContent(selectedMessage)}
               </h2>
             </div>

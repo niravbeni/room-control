@@ -116,9 +116,31 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
     const isThisButtonActive = status === 'sent' || status === 'seen';
     const isDisabled = hasAnyActiveMessage && !isThisButtonActive;
     
-    const baseClasses = "w-full h-full text-white rounded-2xl flex flex-col items-center justify-center gap-4 text-2xl font-semibold shadow-lg transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
+    const baseClasses = "w-full h-full text-white rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
     
-    // Get room-specific colors - all pink for now
+    // Special styling for custom message button
+    if (messageType === 'custom') {
+      const customBaseClasses = "w-full h-full rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-4 border-dashed border-gray-400";
+      
+      // Sent status - grey with yellow border
+      if (status === 'sent') {
+        return `${customBaseClasses} border-yellow-400 hover:scale-[1.02] active:scale-[0.98]`;
+      }
+      
+      // Seen status - grey with green border
+      if (status === 'seen') {
+        return `${customBaseClasses} border-green-400 hover:scale-[1.02] active:scale-[0.98]`;
+      }
+      
+      // Normal state - grey background with dashed border
+      if (isDisabled) {
+        return `${customBaseClasses} cursor-not-allowed opacity-50`;
+      }
+      
+      return `${customBaseClasses} hover:scale-[1.02] active:scale-[0.98]`;
+    }
+    
+    // Get room-specific colors - all pink for other buttons
     const getRoomColors = () => {
       return 'from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700';
     };
@@ -160,7 +182,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
         <div className="h-full w-full">
           <div className="grid grid-cols-2 gap-3 h-full w-full">
             
-            {/* Delay Service Button */}
+            {/* Do Not Disturb Button */}
             <div className="relative">
               <button
                 className={getButtonClasses('delay')}
@@ -169,13 +191,13 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
               >
                 <span className="text-6xl">⏰</span>
                 <span className="text-center leading-tight px-4">
-                  Delay the service<br />by 15mins
+                  Do Not Disturb<br />For 10min
                 </span>
               </button>
               {renderStatusBadge('delay')}
             </div>
 
-            {/* Water Bottles Button */}
+            {/* Refill Water Button */}
             <div className="relative">
               <button
                 className={getButtonClasses('water')}
@@ -184,22 +206,22 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
               >
                 <span className="text-6xl">💧</span>
                 <span className="text-center leading-tight px-4">
-                  Bring new<br />water bottles
+                  Refill<br />Water
                 </span>
               </button>
               {renderStatusBadge('water')}
             </div>
 
-            {/* Cancel Coffee Button */}
+            {/* Refill Fridge & Snacks Button */}
             <div className="relative">
               <button
                 className={getButtonClasses('cancel')}
                 onClick={() => handleButtonClick('cancel')}
                 disabled={!isConnected || (messages.some(msg => msg.roomId === roomId && (msg.status === 'sent' || msg.status === 'seen')) && getMessageStatus('cancel') !== 'sent' && getMessageStatus('cancel') !== 'seen')}
               >
-                <span className="text-6xl">❌</span>
+                <span className="text-6xl">🍿</span>
                 <span className="text-center leading-tight px-4">
-                  Cancel the coffee<br />order
+                  Refill Fridge &<br />Snacks
                 </span>
               </button>
               {renderStatusBadge('cancel')}
@@ -208,21 +230,31 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
             {/* Custom Message Button */}
             <div className="relative">
               {showCustomInput ? (
-                <div className="w-full h-full bg-gradient-to-br from-pink-500 to-pink-600 rounded-2xl p-6 flex flex-col items-center justify-center gap-4">
+                <div className="w-full h-full bg-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-4" style={{backgroundColor: '#E1E1E1'}}>
                   <span className="text-5xl">✏️</span>
-                  <input
-                    value={customMessage}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCustomMessage(e.target.value)}
-                    placeholder="Enter custom message..."
-                    className="w-full text-center text-lg px-4 py-3 border-2 border-white rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white cursor-text bg-white/20 text-white placeholder-white/70"
-                    onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleCustomMessageSend()}
-                    autoFocus
-                  />
+                  <div className="w-full">
+                    <textarea
+                      value={customMessage}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                        if (e.target.value.length <= 100) {
+                          setCustomMessage(e.target.value);
+                        }
+                      }}
+                      placeholder="Enter custom message..."
+                      className="w-full text-center text-sm px-4 py-3 border-2 border-gray-400 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:border-gray-500 cursor-text bg-white text-gray-800 placeholder-gray-500 resize-none h-20"
+                      onKeyPress={(e: React.KeyboardEvent<HTMLTextAreaElement>) => e.key === 'Enter' && !e.shiftKey && handleCustomMessageSend()}
+                      autoFocus
+                      maxLength={100}
+                    />
+                    <div className="text-xs text-gray-600 mt-1 text-center">
+                      {customMessage.length}/100 characters
+                    </div>
+                  </div>
                   <div className="flex gap-3">
                     <button
                       onClick={handleCustomMessageSend}
                       disabled={!customMessage.trim() || !isConnected}
-                      className="bg-white text-pink-600 px-6 py-2 rounded-lg font-semibold hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                      className="bg-gray-700 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                       Send
                     </button>
@@ -239,12 +271,15 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
                   className={getButtonClasses('custom')}
                   onClick={() => handleButtonClick('custom')}
                   disabled={!isConnected || (messages.some(msg => msg.roomId === roomId && (msg.status === 'sent' || msg.status === 'seen')) && getMessageStatus('custom') !== 'sent' && getMessageStatus('custom') !== 'seen')}
+                  style={{backgroundColor: '#E1E1E1'}}
                 >
                   <span className="text-6xl">✏️</span>
-                  <span className="text-center leading-tight px-4">
+                  <span className="text-center leading-tight px-4 text-gray-700">
                     {latestCustomMessage && latestCustomMessage.customText 
-                      ? latestCustomMessage.customText 
-                      : 'Custom message'
+                      ? (latestCustomMessage.customText.length > 50 
+                          ? latestCustomMessage.customText.substring(0, 50) + '...' 
+                          : latestCustomMessage.customText)
+                      : 'Custom Message'
                     }
                   </span>
                 </button>
