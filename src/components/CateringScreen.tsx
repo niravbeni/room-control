@@ -215,6 +215,17 @@ export const CateringScreen: React.FC = () => {
 
           {/* Message Content and Buttons Section - Dark pink background */}
           <div className="bg-pink-600 flex flex-col items-center justify-center py-8 px-8 flex-1">
+            {/* Timestamp Section - Semi-transparent text */}
+            <div className="text-center mb-4">
+              <p className="text-white text-2xl opacity-60">
+                Sent at {new Date(selectedMessage.timestamp).toLocaleTimeString([], { 
+                  hour: 'numeric', 
+                  minute: '2-digit',
+                  hour12: true 
+                })}
+              </p>
+            </div>
+
             {/* Message Content */}
             <div className="text-center mb-8 flex-1 flex items-center justify-center">
               <h2 className={`font-bold text-white leading-tight max-w-4xl ${

@@ -11,7 +11,6 @@ interface DashboardScreenProps {
 }
 
 export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, roomId }) => {
-  const [activeButton, setActiveButton] = useState<MessageType | null>(null);
   const [customMessage, setCustomMessage] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   
@@ -55,14 +54,8 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
   };
 
   const handleSendMessage = (type: MessageType, customText?: string) => {
-    // Set active button for visual feedback
-    setActiveButton(type);
-    
     // Only emit the message - the socket event handler will create the message in the store
     emitMessage(roomId, roomNumber, type, customText);
-    
-    // Reset active button after a brief moment
-    setTimeout(() => setActiveButton(null), 200);
   };
   
   const handleCustomMessageSend = () => {
@@ -116,20 +109,20 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
     const isThisButtonActive = status === 'sent' || status === 'seen';
     const isDisabled = hasAnyActiveMessage && !isThisButtonActive;
     
-    const baseClasses = "w-full h-full text-white rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
+    const baseClasses = "w-full h-full text-white rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
     
     // Special styling for custom message button
     if (messageType === 'custom') {
-      const customBaseClasses = "w-full h-full rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg transition-all duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-4 border-dashed border-gray-400";
+      const customBaseClasses = "w-full h-full rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg transition-colors duration-150 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-4 border-dashed border-gray-400";
       
       // Sent status - grey with yellow border
       if (status === 'sent') {
-        return `${customBaseClasses} border-yellow-400 hover:scale-[1.02] active:scale-[0.98]`;
+        return `${customBaseClasses} border-yellow-400`;
       }
       
       // Seen status - grey with green border
       if (status === 'seen') {
-        return `${customBaseClasses} border-green-400 hover:scale-[1.02] active:scale-[0.98]`;
+        return `${customBaseClasses} border-green-400`;
       }
       
       // Normal state - grey background with dashed border
@@ -137,7 +130,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
         return `${customBaseClasses} cursor-not-allowed opacity-50`;
       }
       
-      return `${customBaseClasses} hover:scale-[1.02] active:scale-[0.98]`;
+      return `${customBaseClasses}`;
     }
     
     // Get room-specific colors - all pink for other buttons
@@ -147,12 +140,12 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
     
     // Sent status - darker pink with yellow border
     if (status === 'sent') {
-      return `${baseClasses} bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 border-4 border-yellow-400 hover:scale-[1.02] active:scale-[0.98]`;
+      return `${baseClasses} bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 border-4 border-yellow-400`;
     }
     
     // Seen status - darker pink with green border
     if (status === 'seen') {
-      return `${baseClasses} bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 border-4 border-green-400 hover:scale-[1.02] active:scale-[0.98]`;
+      return `${baseClasses} bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 border-4 border-green-400`;
     }
     
     // Normal state (idle or resolved) - disabled if other button is active
@@ -160,12 +153,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({ roomNumber, ro
       return `${baseClasses} bg-gradient-to-br from-gray-400 to-gray-500 cursor-not-allowed opacity-50`;
     }
     
-    // Active button state - dark pink
-    if (activeButton === messageType) {
-      return `${baseClasses} bg-gradient-to-br from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 hover:scale-[1.02] active:scale-[0.98]`;
-    }
-    
-    return `${baseClasses} bg-gradient-to-br ${getRoomColors()} hover:scale-[1.02] active:scale-[0.98]`;
+    return `${baseClasses} bg-gradient-to-br ${getRoomColors()}`;
   };
 
   return (
