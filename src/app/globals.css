@@ -161,6 +161,22 @@
     min-height: 44px;
     min-width: 44px;
     touch-action: manipulation;
+    /* Prevent iOS button scaling and press effects */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+    /* Prevent any transform animations on press */
+    transform: none !important;
+    /* Disable any default button animations */
+    transition: none;
+  }
+  
+  /* Override any hover/active states that might cause scaling */
+  button:hover, button:active, button:focus,
+  [role="button"]:hover, [role="button"]:active, [role="button"]:focus {
+    transform: none !important;
+    scale: none !important;
   }
   
   /* Remove any default margins/padding that could cause overflow */
@@ -257,5 +273,12 @@
   @keyframes fadeIn {
     from { opacity: 0; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1); }
+  }
+  
+  /* Custom button transition that only affects colors, not transforms */
+  .custom-button-transition {
+    transition: background-color 0.3s ease-in-out, 
+                border-color 0.3s ease-in-out, 
+                opacity 0.3s ease-in-out;
   }
 }

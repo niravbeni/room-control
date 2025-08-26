@@ -130,12 +130,12 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
     // Always include border-4 to prevent iOS jumping - only change border color
     const baseClasses =
-      "w-full h-full text-white rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg transition-all duration-300 ease-in-out cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-4";
+      "w-full h-full text-white rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg custom-button-transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-4";
 
     // Special styling for custom message button
     if (messageType === "custom") {
       const customBaseClasses =
-        "w-full h-full rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg transition-all duration-300 ease-in-out cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-4 border-dashed";
+        "w-full h-full rounded-2xl flex flex-col items-center justify-center gap-4 text-3xl font-semibold shadow-lg custom-button-transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed border-4 border-dashed";
 
       // Sent status - grey with yellow border
       if (status === "sent") {
