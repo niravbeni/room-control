@@ -195,8 +195,7 @@ export default function AnalyticsPage() {
   const getRoomStats = () => {
     const stats = {
       'dashboard-a': { total: 0, completed: 0, avgTime: 0 },
-      'dashboard-b': { total: 0, completed: 0, avgTime: 0 },
-      'dashboard-c': { total: 0, completed: 0, avgTime: 0 }
+      'dashboard-b': { total: 0, completed: 0, avgTime: 0 }
     }
 
     messageFlows.forEach(flow => {
@@ -253,9 +252,8 @@ export default function AnalyticsPage() {
 
   const getRoomName = (roomId: string) => {
     switch (roomId) {
-      case 'dashboard-a': return 'Room 139'
-      case 'dashboard-b': return 'Room 143'
-      case 'dashboard-c': return 'Room 150'
+      case 'dashboard-a': return 'Room 127'
+      case 'dashboard-b': return 'Room 136'
       default: return roomId
     }
   }

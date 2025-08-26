@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type RoomId = 'dashboard-a' | 'dashboard-b' | 'dashboard-c';
+export type RoomId = 'dashboard-a' | 'dashboard-b';
 export type MessageType = 'delay' | 'water' | 'cancel' | 'custom';
 export type MessageStatus = 'idle' | 'sent' | 'seen' | 'resolved';
 

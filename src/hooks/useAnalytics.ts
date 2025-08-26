@@ -19,9 +19,8 @@ export const useAnalytics = () => {
     }
 
     const roomNames = {
-      'dashboard-a': 'Room 139',
-      'dashboard-b': 'Room 143', 
-      'dashboard-c': 'Room 150'
+      'dashboard-a': 'Room 127',
+      'dashboard-b': 'Room 136'
     }
 
     const now = new Date().toISOString()
@@ -198,9 +197,8 @@ export const useAnalytics = () => {
       const secondsBeforeCancellation = Math.floor((cancelledTime.getTime() - sentTime.getTime()) / 1000)
 
       const roomNames = {
-        'dashboard-a': 'Room 139',
-        'dashboard-b': 'Room 143', 
-        'dashboard-c': 'Room 150'
+        'dashboard-a': 'Room 127',
+        'dashboard-b': 'Room 136'
       }
 
       // Create cancellation record
