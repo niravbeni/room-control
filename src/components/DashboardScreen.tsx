@@ -20,19 +20,20 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   const {
     isConnected,
     messages, // Subscribe to messages array to trigger re-renders
+    activeMessages, // Subscribe to active messages to detect when custom messages are resolved
   } = useStore();
 
   const { emitMessage, emitMessageCancelled } = useSocket();
 
-  // Get latest custom message specifically
+  // Get latest custom message specifically (only from active messages)
   const latestCustomMessage = useMemo(() => {
-    const customMessages = messages.filter(
+    const customMessages = activeMessages.filter(
       (msg) => msg.roomId === roomId && msg.type === "custom"
     );
     return customMessages.length > 0
       ? customMessages[customMessages.length - 1]
       : null;
-  }, [messages, roomId]);
+  }, [activeMessages, roomId]);
 
   const handleButtonClick = (type: MessageType, customText?: string) => {
     const status = getMessageStatus(type);
