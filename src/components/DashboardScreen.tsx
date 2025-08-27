@@ -184,7 +184,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
       {/* Header */}
       <div className="py-4 px-6 text-center flex-shrink-0">
         <h1 className="text-3xl font-normal text-black">
-          Send quick messages to the catering
+          Catering Communication Panel
         </h1>
       </div>
 
@@ -340,7 +340,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                         ? latestCustomMessage.customText.substring(0, 50) +
                           "..."
                         : latestCustomMessage.customText
-                      : "Custom Message"}
+                      : "Send message to catering"}
                   </span>
                 </button>
               )}
