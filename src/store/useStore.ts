@@ -64,7 +64,7 @@ function getMessageContent(type: MessageType, customText?: string): string {
     case 'cancel':
       return 'Refill Fridge & Snacks';
     case 'custom':
-      return customText || 'Send message to catering';
+      return customText || 'Custom Message';
     default:
       return 'Unknown message';
   }

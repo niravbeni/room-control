@@ -15,7 +15,7 @@ export const useAnalytics = () => {
       delay: 'Do Not Disturb For 10min',
       water: 'Refill Water', 
       cancel: 'Refill Fridge & Snacks',
-      custom: 'Send message to catering'
+      custom: 'Custom Message'
     }
 
     const roomNames = {
