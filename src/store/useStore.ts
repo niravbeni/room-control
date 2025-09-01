@@ -62,7 +62,7 @@ function getMessageContent(type: MessageType, customText?: string): string {
     case 'water':
       return 'Refill Water';
     case 'cancel':
-      return 'Refill Fridge & Snacks';
+      return 'Room Refresh';
     case 'custom':
       return customText || 'Custom Message';
     default:

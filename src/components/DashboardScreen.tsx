@@ -244,7 +244,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
               {renderStatusBadge("water")}
             </div>
 
-            {/* Refill Fridge & Snacks Button */}
+            {/* Room Refresh Button */}
             <div className="relative">
               <button
                 className={getButtonClasses("cancel")}
@@ -260,10 +260,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
                     getMessageStatus("cancel") !== "seen")
                 }
               >
-                <span className="text-6xl">🍿</span>
+                <span className="text-6xl">✨</span>
                 <span className="text-center leading-tight px-4">
-                  Refill Fridge &<br />
-                  Snacks
+                  Room Refresh
                 </span>
               </button>
               {renderStatusBadge("cancel")}

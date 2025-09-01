@@ -14,7 +14,7 @@ export const useAnalytics = () => {
     const buttonLabels = {
       delay: 'Do Not Disturb For 10min',
       water: 'Refill Water', 
-      cancel: 'Refill Fridge & Snacks',
+      cancel: 'Room Refresh',
       custom: 'Custom Message'
     }
 
