@@ -29,8 +29,7 @@ export const CateringScreen: React.FC = () => {
 
   // Room number mapping
   const roomNumberMap: { [key in RoomId]: string } = {
-    'dashboard-a': '127',
-    'dashboard-b': '136'
+    'dashboard-a': '131'
   };
 
   // Format message content with time calculation for delay messages
@@ -63,8 +62,7 @@ export const CateringScreen: React.FC = () => {
 
   // Room selection buttons (temporary - will be replaced with map)
   const roomButtons = [
-    { id: 'dashboard-a' as RoomId, label: 'Room 127' },
-    { id: 'dashboard-b' as RoomId, label: 'Room 136' }
+    { id: 'dashboard-a' as RoomId, label: 'Room 131' }
   ];
 
   const handleRoomClick = (roomId: RoomId) => {
@@ -81,9 +79,8 @@ export const CateringScreen: React.FC = () => {
     return activeMessages.filter(msg => msg.roomId === roomId).length;
   };
 
-  // Check if each room has active messages
+  // Check if room has active messages
   const hasRoomAMessages = getMessageCount('dashboard-a') > 0;
-  const hasRoomBMessages = getMessageCount('dashboard-b') > 0;
 
   return (
     <div className="min-h-screen w-full flex flex-col ipad-ultra-safe">
@@ -103,7 +100,6 @@ export const CateringScreen: React.FC = () => {
             const getRoomColor = (roomId: string) => {
               switch (roomId) {
                 case 'dashboard-a': return 'bg-blue-600 hover:bg-blue-700';
-                case 'dashboard-b': return 'bg-orange-600 hover:bg-orange-700';
                 default: return 'bg-gray-600 hover:bg-gray-700';
               }
             };
@@ -161,20 +157,7 @@ export const CateringScreen: React.FC = () => {
               />
             )}
             
-            {/* Room B Overlay Layer */}
-            {hasRoomBMessages && (
-              <Image
-                src="/room-b.svg"
-                alt="Room B Active"
-                width={800}
-                height={600}
-                className="absolute top-0 left-0 w-full h-full object-contain transition-opacity duration-300"
-                style={{
-                  filter: roomFlashStates['dashboard-b'] ? 'drop-shadow(0 0 10px rgba(34, 197, 94, 0.8))' : 'none'
-                }}
-                priority
-              />
-            )}
+
             
 
           </div>
@@ -187,7 +170,6 @@ export const CateringScreen: React.FC = () => {
           {/* Room Number Section - Color matches selected room */}
           <div className={`py-6 text-center ${
             selectedMessage.roomId === 'dashboard-a' ? 'bg-blue-600' :
-            selectedMessage.roomId === 'dashboard-b' ? 'bg-orange-600' :
             'bg-pink-600'
           }`}>
             <h1 className="text-4xl font-bold text-white">
