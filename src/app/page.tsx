@@ -16,7 +16,7 @@ export default function HomePage() {
             <Monitor className="w-8 h-8 text-blue-600" />
           </div>
           <h3 className="text-xl font-semibold mb-2 text-center">Dashboard A</h3>
-          <p className="text-gray-600 mb-3 text-center">Room 127</p>
+          <p className="text-gray-600 mb-3 text-center">Room 121</p>
           <Link href="/dashboard-a">
             <Button className="w-full bg-blue-600 hover:bg-blue-700 cursor-pointer">
               Open Dashboard A
@@ -30,7 +30,7 @@ export default function HomePage() {
             <Monitor className="w-8 h-8 text-orange-600" />
             </div>
           <h3 className="text-xl font-semibold mb-2 text-center">Dashboard B</h3>
-          <p className="text-gray-600 mb-3 text-center">Room 136</p>
+          <p className="text-gray-600 mb-3 text-center">Room 130</p>
           <Link href="/dashboard-b">
             <Button className="w-full bg-orange-600 hover:bg-orange-700 cursor-pointer">
               Open Dashboard B

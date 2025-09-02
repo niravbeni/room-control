@@ -29,8 +29,8 @@ export const CateringScreen: React.FC = () => {
 
   // Room number mapping
   const roomNumberMap: { [key in RoomId]: string } = {
-    'dashboard-a': '127',
-    'dashboard-b': '136'
+    'dashboard-a': '121',
+    'dashboard-b': '130'
   };
 
   // Format message content with time calculation for delay messages
@@ -63,8 +63,8 @@ export const CateringScreen: React.FC = () => {
 
   // Room selection buttons (temporary - will be replaced with map)
   const roomButtons = [
-    { id: 'dashboard-a' as RoomId, label: 'Room 127' },
-    { id: 'dashboard-b' as RoomId, label: 'Room 136' }
+    { id: 'dashboard-a' as RoomId, label: 'Room 121' },
+    { id: 'dashboard-b' as RoomId, label: 'Room 130' }
   ];
 
   const handleRoomClick = (roomId: RoomId) => {

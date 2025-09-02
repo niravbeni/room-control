@@ -252,8 +252,8 @@ export default function AnalyticsPage() {
 
   const getRoomName = (roomId: string) => {
     switch (roomId) {
-      case 'dashboard-a': return 'Room 127'
-      case 'dashboard-b': return 'Room 136'
+      case 'dashboard-a': return 'Room 121'
+      case 'dashboard-b': return 'Room 130'
       default: return roomId
     }
   }
