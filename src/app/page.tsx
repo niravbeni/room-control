@@ -3,7 +3,8 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Monitor, Tablet } from 'lucide-react';
+import { Monitor, Tablet, Volume2 } from 'lucide-react';
+import { AudioSettings } from '@/components/AudioSettings';
 
 export default function HomePage() {
   return (
@@ -54,6 +55,11 @@ export default function HomePage() {
           </Link>
         </Card>
 
+      </div>
+
+      {/* Audio Settings Panel */}
+      <div className="mt-8 max-w-md mx-auto">
+        <AudioSettings />
       </div>
     </div>
   );

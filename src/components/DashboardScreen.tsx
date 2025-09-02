@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useStore, RoomId, MessageType } from "@/store/useStore";
 import { useSocket } from "@/hooks/useSocket";
+import { useAudio } from "@/hooks/useAudio";
 import { Badge } from "@/components/ui/badge";
 
 interface DashboardScreenProps {
@@ -24,6 +25,7 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   } = useStore();
 
   const { emitMessage, emitMessageCancelled } = useSocket();
+  const { playButtonSound, playStatusSound } = useAudio();
 
   // Get latest custom message specifically (only from active messages)
   const latestCustomMessage = useMemo(() => {
@@ -40,6 +42,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
 
     // If message is already sent, cancel it
     if (status === "sent") {
+      // Play the same button sound for unselecting/cancelling
+      playButtonSound(type);
+      
       const messagesByType = messages.filter(
         (msg) => msg.roomId === roomId && msg.type === type
       );
@@ -65,6 +70,9 @@ export const DashboardScreen: React.FC<DashboardScreenProps> = ({
   };
 
   const handleSendMessage = (type: MessageType, customText?: string) => {
+    // Play button sound first
+    playButtonSound(type);
+    
     // Only emit the message - the socket event handler will create the message in the store
     emitMessage(roomId, roomNumber, type, customText);
   };

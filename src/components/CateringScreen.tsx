@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Image from 'next/image';
 import { useStore, RoomId } from '@/store/useStore';
 import { useSocket } from '@/hooks/useSocket';
+import { useAudio } from '@/hooks/useAudio';
 
 export const CateringScreen: React.FC = () => {
   const { 
@@ -17,15 +18,21 @@ export const CateringScreen: React.FC = () => {
   } = useStore();
   
   const { emitMessageSeen, emitMessageResolved } = useSocket();
+  const { playStatusSound, playRoomAlert } = useAudio();
   
   const selectedMessage = getSelectedMessage();
   
-  // Auto-select first message if none selected
+  // Auto-select messages without requiring room tab clicks
   useEffect(() => {
-    if (activeMessages.length > 0 && !selectedMessageId) {
-      selectMessage(activeMessages[0].id);
+    if (activeMessages.length > 0) {
+      // Always auto-select the latest message (most recent)
+      const latestMessage = activeMessages[activeMessages.length - 1];
+      selectMessage(latestMessage.id);
+      
+      // Play room-specific alert for the latest message
+      playRoomAlert(latestMessage.roomId);
     }
-  }, [activeMessages, selectedMessageId, selectMessage]);
+  }, [activeMessages.length, activeMessages, selectMessage, playRoomAlert]);
 
   // Room number mapping
   const roomNumberMap: { [key in RoomId]: string } = {
@@ -52,12 +59,14 @@ export const CateringScreen: React.FC = () => {
   const handleSeen = () => {
     if (selectedMessage) {
       emitMessageSeen(selectedMessage.id);
+      playStatusSound('seen');
     }
   };
 
   const handleResolved = () => {
     if (selectedMessage) {
       emitMessageResolved(selectedMessage.id, selectedMessage.roomId);
+      playStatusSound('resolved');
     }
   };
 
