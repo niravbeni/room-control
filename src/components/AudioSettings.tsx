@@ -57,7 +57,7 @@ export const AudioSettings: React.FC = () => {
 
       {/* Sound Info */}
       <div className="mt-4 text-xs text-gray-500">
-        <p><strong>Room Alerts:</strong> Unique sounds for Room 121 vs Room 130</p>
+        <p><strong>Room Alerts:</strong> Sound notifications for Room 121</p>
         <p><strong>Note:</strong> Sounds only play on catering screen, dashboards are silent</p>
       </div>
     </div>

@@ -11,7 +11,6 @@ const AUDIO_CONFIG = {
 const SOUNDS = {
   rooms: {
     'dashboard-a': '/sounds/room-a.wav', // Room 121
-    'dashboard-b': '/sounds/room-b.wav', // Room 130
   }
 } as const;
 
