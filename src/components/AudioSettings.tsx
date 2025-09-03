@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useAudio } from '@/hooks/useAudio';
 
 export const AudioSettings: React.FC = () => {
-  const { isEnabled, volume, setAudioEnabled, setVolume, playButtonSound } = useAudio();
+  const { isEnabled, volume, setAudioEnabled, setVolume, playTestSound } = useAudio();
   const [localVolume, setLocalVolume] = useState(volume * 100); // Convert to percentage (should be 100% by default)
 
   const handleVolumeChange = (newVolume: number) => {
@@ -13,7 +13,7 @@ export const AudioSettings: React.FC = () => {
   };
 
   const handleTestSound = () => {
-    playButtonSound('delay'); // Test with "Do Not Disturb" sound
+    playTestSound(); // Test sound for settings
   };
 
   return (
@@ -62,9 +62,9 @@ export const AudioSettings: React.FC = () => {
 
       {/* Sound Info */}
       <div className="mt-4 text-xs text-gray-500">
-        <p><strong>Button Sounds:</strong> Different sounds for each button type</p>
-        <p><strong>Status Sounds:</strong> Confirmation for sent/seen/resolved</p>
         <p><strong>Room Alerts:</strong> Unique sounds for Room 121 vs Room 130</p>
+        <p><strong>Status Sounds:</strong> Confirmation for seen/resolved actions</p>
+        <p><strong>Note:</strong> Sounds only play on catering screen, dashboards are silent</p>
       </div>
     </div>
   );

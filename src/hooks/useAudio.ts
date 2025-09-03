@@ -7,14 +7,8 @@ const AUDIO_CONFIG = {
   enabled: true, // Can be controlled by user settings
 };
 
-// Sound mappings
+// Sound mappings (only for catering screen)
 const SOUNDS = {
-  buttons: {
-    delay: '/sounds/button-1.wav',    // ⏰ Do Not Disturb
-    water: '/sounds/button-2.wav',    // 💧 Refill Water  
-    cancel: '/sounds/button-3.wav',   // ✨ Room Refresh
-    custom: '/sounds/button-4.wav',   // ✏️ Custom Message
-  },
   status: {
     seen: '/sounds/seen.wav', 
     resolved: '/sounds/resolved.wav',
@@ -49,12 +43,9 @@ export const useAudio = () => {
     }
   }, []);
 
-  // Button press sounds
-  const playButtonSound = useCallback((buttonType: MessageType) => {
-    const soundPath = SOUNDS.buttons[buttonType];
-    if (soundPath) {
-      playSound(soundPath);
-    }
+  // Test sound for settings (using delay button sound file)
+  const playTestSound = useCallback(() => {
+    playSound('/sounds/button-1.wav'); // Test with Do Not Disturb sound
   }, [playSound]);
 
   // Status change sounds
@@ -83,7 +74,7 @@ export const useAudio = () => {
   }, []);
 
   return {
-    playButtonSound,
+    playTestSound,
     playStatusSound,
     playRoomAlert,
     setAudioEnabled,
