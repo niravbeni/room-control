@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useStore, RoomId, MessageType } from "@/store/useStore";
 import { useSocket } from "@/hooks/useSocket";
-import { Badge } from "@/components/ui/badge";
+
 
 interface DashboardScreenProps {
   roomNumber: string;

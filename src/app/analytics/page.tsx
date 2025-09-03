@@ -45,12 +45,6 @@ export default function AnalyticsPage() {
     resetCustomMessages
   } = useAnalytics()
 
-  useEffect(() => {
-    loadAnalytics()
-    loadCustomMessages()
-    loadTotalRecords()
-  }, [selectedDate])
-
   const loadTotalRecords = async () => {
     const count = await getAnalyticsCount()
     const customCount = await getCustomMessagesCount()
@@ -83,6 +77,13 @@ export default function AnalyticsPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    loadAnalytics()
+    loadCustomMessages()
+    loadTotalRecords()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate])
 
   const exportToCSV = () => {
     const headers = [

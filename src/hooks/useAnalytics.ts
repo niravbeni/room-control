@@ -1,6 +1,5 @@
 import { useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
-import type { MessageFlow, CustomMessage, ButtonCancellation } from '@/lib/supabase'
 import type { RoomId, MessageType } from '@/store/useStore'
 
 export const useAnalytics = () => {

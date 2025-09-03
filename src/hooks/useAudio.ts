@@ -16,14 +16,14 @@ const SOUNDS = {
 
 export const useAudio = () => {
   const audioContextRef = useRef<AudioContext | null>(null);
-  const audioBuffersRef = useRef<Map<string, AudioBuffer>>(new Map());
   const audioElementsRef = useRef<Map<string, HTMLAudioElement>>(new Map());
   const isInitializedRef = useRef(false);
 
   // Debug: Override Audio constructor to catch unexpected audio creation
   useEffect(() => {
     const originalAudio = window.Audio;
-    window.Audio = function(src?: string) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).Audio = function(src?: string) {
       console.log('🎵 NEW Audio() created with src:', src);
       console.trace('Audio creation stack trace:');
       const audio = new originalAudio(src);
@@ -37,7 +37,7 @@ export const useAudio = () => {
       };
       
       return audio;
-    } as any;
+    };
 
     // Also override HTMLAudioElement.prototype.play
     const originalPrototypePlay = HTMLAudioElement.prototype.play;
@@ -61,7 +61,7 @@ export const useAudio = () => {
 
     try {
       // Initialize AudioContext for iOS compatibility
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
         audioContextRef.current = new AudioContextClass();
         console.log('✅ AudioContext created');
