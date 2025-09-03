@@ -9,7 +9,6 @@ import { useAudio } from '@/hooks/useAudio';
 export const CateringScreen: React.FC = () => {
   const { 
     activeMessages,
-    selectedMessageId,
     roomFlashStates,
     selectMessage,
     getSelectedMessage,
@@ -18,19 +17,30 @@ export const CateringScreen: React.FC = () => {
   } = useStore();
   
   const { emitMessageSeen, emitMessageResolved } = useSocket();
-  const { playStatusSound, playRoomAlert } = useAudio();
+  const { playRoomAlert } = useAudio();
   
   const selectedMessage = getSelectedMessage();
   
   // Auto-select messages without requiring room tab clicks
   useEffect(() => {
+    console.log('🔔 CateringScreen: activeMessages changed, length:', activeMessages.length);
+    console.log('🔔 Active messages:', activeMessages.map(m => ({ id: m.id, roomId: m.roomId, type: m.type, status: m.status })));
+    
     if (activeMessages.length > 0) {
       // Always auto-select the latest message (most recent)
       const latestMessage = activeMessages[activeMessages.length - 1];
+      console.log('📨 Latest message:', latestMessage.roomId, latestMessage.type, latestMessage.content, 'status:', latestMessage.status);
       selectMessage(latestMessage.id);
       
-      // Play room-specific alert for the latest message
-      playRoomAlert(latestMessage.roomId);
+      // ONLY play sound for NEW messages (not seen/resolved messages)
+      if (latestMessage.status === 'sent') {
+        console.log('🎵 Playing sound for NEW message:', latestMessage.roomId);
+        playRoomAlert(latestMessage.roomId);
+      } else {
+        console.log('🔇 NOT playing sound - message status is:', latestMessage.status);
+      }
+    } else {
+      console.log('📭 No active messages');
     }
   }, [activeMessages.length, activeMessages, selectMessage, playRoomAlert]);
 
@@ -58,15 +68,46 @@ export const CateringScreen: React.FC = () => {
 
   const handleSeen = () => {
     if (selectedMessage) {
+      console.log('👁️ Seen button clicked - NO AUDIO should play');
+      
+      // Debug: Check for any audio elements on the page
+      const allAudioElements = document.querySelectorAll('audio');
+      console.log('🔍 All audio elements on page:', allAudioElements.length);
+      allAudioElements.forEach((audio, index) => {
+        console.log(`Audio ${index}:`, {
+          src: audio.src,
+          paused: audio.paused,
+          currentTime: audio.currentTime,
+          volume: audio.volume,
+          id: audio.id,
+          className: audio.className
+        });
+      });
+      
+      // Also check for any audio elements that might be created dynamically
+      console.log('🔍 Checking for sounds played via Web Audio or other methods...');
+      
+      // Check if any sounds are currently playing
+      const playingAudio = Array.from(allAudioElements).filter(audio => !audio.paused);
+      if (playingAudio.length > 0) {
+        console.warn('🚨 Found playing audio elements:', playingAudio);
+      }
+      
       emitMessageSeen(selectedMessage.id);
-      playStatusSound('seen');
+      
+      // Debug: Check again after the emit to see if anything started playing
+      setTimeout(() => {
+        const stillPlayingAudio = Array.from(document.querySelectorAll('audio')).filter(audio => !audio.paused);
+        if (stillPlayingAudio.length > 0) {
+          console.warn('🚨 Audio playing AFTER seen click:', stillPlayingAudio);
+        }
+      }, 100);
     }
   };
 
   const handleResolved = () => {
     if (selectedMessage) {
       emitMessageResolved(selectedMessage.id, selectedMessage.roomId);
-      playStatusSound('resolved');
     }
   };
 

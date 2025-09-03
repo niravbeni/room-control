@@ -4,16 +4,12 @@ import { useState } from 'react';
 import { useAudio } from '@/hooks/useAudio';
 
 export const AudioSettings: React.FC = () => {
-  const { isEnabled, volume, setAudioEnabled, setVolume, playTestSound } = useAudio();
+  const { isEnabled, volume, setAudioEnabled, setVolume } = useAudio();
   const [localVolume, setLocalVolume] = useState(volume * 100); // Convert to percentage (should be 100% by default)
 
   const handleVolumeChange = (newVolume: number) => {
     setLocalVolume(newVolume);
     setVolume(newVolume / 100); // Convert back to 0-1 range
-  };
-
-  const handleTestSound = () => {
-    playTestSound(); // Test sound for settings
   };
 
   return (
@@ -51,19 +47,17 @@ export const AudioSettings: React.FC = () => {
         />
       </div>
 
-      {/* Test Sound Button */}
+      {/* Test Sound Button - Disabled */}
       <button
-        onClick={handleTestSound}
-        disabled={!isEnabled}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white py-2 px-4 rounded-lg font-medium transition-colors"
+        disabled={true}
+        className="w-full bg-gray-400 cursor-not-allowed text-white py-2 px-4 rounded-lg font-medium"
       >
-        🎵 Test Sound
+        🎵 Test Sound (Disabled)
       </button>
 
       {/* Sound Info */}
       <div className="mt-4 text-xs text-gray-500">
         <p><strong>Room Alerts:</strong> Unique sounds for Room 121 vs Room 130</p>
-        <p><strong>Status Sounds:</strong> Confirmation for seen/resolved actions</p>
         <p><strong>Note:</strong> Sounds only play on catering screen, dashboards are silent</p>
       </div>
     </div>

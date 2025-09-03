@@ -1,5 +1,5 @@
-import { useCallback } from 'react';
-import { MessageType, RoomId } from '@/store/useStore';
+import { useCallback, useRef, useEffect } from 'react';
+import { RoomId } from '@/store/useStore';
 
 // Audio configuration
 const AUDIO_CONFIG = {
@@ -7,12 +7,8 @@ const AUDIO_CONFIG = {
   enabled: true, // Can be controlled by user settings
 };
 
-// Sound mappings (only for catering screen)
+// Sound mappings (only room alerts for catering screen)
 const SOUNDS = {
-  status: {
-    seen: '/sounds/seen.wav', 
-    resolved: '/sounds/resolved.wav',
-  },
   rooms: {
     'dashboard-a': '/sounds/room-a.wav', // Room 121
     'dashboard-b': '/sounds/room-b.wav', // Room 130
@@ -20,48 +16,175 @@ const SOUNDS = {
 } as const;
 
 export const useAudio = () => {
-  // Generic audio player function
-  const playSound = useCallback((soundPath: string, volume: number = AUDIO_CONFIG.volume) => {
-    if (!AUDIO_CONFIG.enabled) return;
-    
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const audioBuffersRef = useRef<Map<string, AudioBuffer>>(new Map());
+  const audioElementsRef = useRef<Map<string, HTMLAudioElement>>(new Map());
+  const isInitializedRef = useRef(false);
+
+  // Debug: Override Audio constructor to catch unexpected audio creation
+  useEffect(() => {
+    const originalAudio = window.Audio;
+    window.Audio = function(src?: string) {
+      console.log('🎵 NEW Audio() created with src:', src);
+      console.trace('Audio creation stack trace:');
+      const audio = new originalAudio(src);
+      
+      // Monitor this audio element
+      const originalPlay = audio.play;
+      audio.play = function(...args) {
+        console.log('▶️ Audio.play() called on:', src || 'unknown src');
+        console.trace('Play call stack:');
+        return originalPlay.apply(this, args);
+      };
+      
+      return audio;
+    } as any;
+
+    // Also override HTMLAudioElement.prototype.play
+    const originalPrototypePlay = HTMLAudioElement.prototype.play;
+    HTMLAudioElement.prototype.play = function(...args) {
+      console.log('▶️ HTMLAudioElement.play() called on:', this.src);
+      console.trace('Prototype play call stack:');
+      return originalPrototypePlay.apply(this, args);
+    };
+
+    return () => {
+      window.Audio = originalAudio;
+      HTMLAudioElement.prototype.play = originalPrototypePlay;
+    };
+  }, []);
+
+  // Initialize AudioContext and preload sounds
+  const initializeAudio = useCallback(async () => {
+    if (isInitializedRef.current) return;
+
+    console.log('🎵 Initializing audio system...');
+
     try {
-      const audio = new Audio(soundPath);
-      audio.volume = Math.max(0, Math.min(1, volume)); // Clamp between 0-1
-      audio.currentTime = 0; // Reset to start if already playing
-      
-      // Play the sound
-      const playPromise = audio.play();
-      
-      // Handle browsers that return a promise
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.warn('Audio playback failed:', error);
-        });
+      // Initialize AudioContext for iOS compatibility
+      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContextClass) {
+        audioContextRef.current = new AudioContextClass();
+        console.log('✅ AudioContext created');
+        
+        // Resume context if suspended (iOS requirement)
+        if (audioContextRef.current.state === 'suspended') {
+          await audioContextRef.current.resume();
+          console.log('✅ AudioContext resumed from suspended state');
+        }
       }
+
+      // Pre-create Audio elements for room sounds
+      Object.entries(SOUNDS.rooms).forEach(([roomId, soundPath]) => {
+        console.log('📁 Creating audio element for:', roomId, '→', soundPath);
+        const audio = new Audio();
+        audio.preload = 'auto';
+        audio.src = soundPath;
+        audio.volume = AUDIO_CONFIG.volume;
+        
+        // Add event listeners for debugging
+        audio.addEventListener('loadstart', () => console.log('📥 Loading started:', roomId));
+        audio.addEventListener('canplay', () => console.log('✅ Can play:', roomId));
+        audio.addEventListener('error', (e) => console.error('❌ Audio error:', roomId, e));
+        audio.addEventListener('play', () => console.log('▶️ Audio PLAY event:', roomId));
+        audio.addEventListener('pause', () => console.log('⏸️ Audio PAUSE event:', roomId));
+        audio.addEventListener('ended', () => console.log('🔚 Audio ENDED event:', roomId));
+        
+        // Preload the audio
+        audio.load();
+        
+        audioElementsRef.current.set(roomId, audio);
+      });
+
+      console.log('✅ Audio system initialized with elements:', Array.from(audioElementsRef.current.keys()));
+      isInitializedRef.current = true;
     } catch (error) {
-      console.warn('Failed to play sound:', soundPath, error);
+      console.warn('❌ Audio initialization failed:', error);
     }
   }, []);
 
-  // Test sound for settings (using delay button sound file)
-  const playTestSound = useCallback(() => {
-    playSound('/sounds/button-1.wav'); // Test with Do Not Disturb sound
-  }, [playSound]);
+  // Initialize audio on first mount
+  useEffect(() => {
+    // Initialize immediately, but also set up for user interaction
+    initializeAudio();
 
-  // Status change sounds
-  const playStatusSound = useCallback((status: 'seen' | 'resolved') => {
-    const soundPath = SOUNDS.status[status];
-    if (soundPath) {
-      playSound(soundPath);
+    // Set up user interaction listeners to unlock audio on iOS
+    const handleUserInteraction = () => {
+      initializeAudio();
+      // Resume AudioContext if it was suspended
+      if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume();
+      }
+    };
+
+    // Listen for any user interaction to unlock audio
+    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+    document.addEventListener('click', handleUserInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+    };
+  }, [initializeAudio]);
+
+  // Enhanced audio playback with retry logic
+  const playSound = useCallback(async (roomId: string) => {
+    console.log('🎵 playSound called for roomId:', roomId);
+    console.log('🔊 Audio enabled:', AUDIO_CONFIG.enabled);
+    
+    if (!AUDIO_CONFIG.enabled) {
+      console.log('❌ Audio disabled, not playing');
+      return;
     }
-  }, [playSound]);
 
-  // Room alert sounds (for catering screen)
+    try {
+      // Ensure audio is initialized
+      await initializeAudio();
+      console.log('✅ Audio initialized');
+
+      const audio = audioElementsRef.current.get(roomId);
+      if (!audio) {
+        console.warn('❌ Audio element not found for room:', roomId);
+        console.log('Available audio elements:', Array.from(audioElementsRef.current.keys()));
+        return;
+      }
+
+      console.log('🎵 Playing audio for room:', roomId, 'src:', audio.src);
+      
+      // Reset audio to beginning
+      audio.currentTime = 0;
+      audio.volume = AUDIO_CONFIG.volume;
+
+      // Play with retry logic
+      const playWithRetry = async (retries = 3): Promise<void> => {
+        try {
+          const playPromise = audio.play();
+          if (playPromise !== undefined) {
+            await playPromise;
+          }
+          console.log('✅ Audio played successfully for room:', roomId);
+        } catch (error) {
+          console.warn('❌ Audio play attempt failed:', error);
+          if (retries > 0) {
+            console.log('🔄 Retrying audio playback, retries left:', retries - 1);
+            // Wait briefly and retry
+            await new Promise(resolve => setTimeout(resolve, 100));
+            return playWithRetry(retries - 1);
+          }
+          throw error;
+        }
+      };
+
+      await playWithRetry();
+    } catch (error) {
+      console.warn('❌ Audio playback failed for room:', roomId, error);
+    }
+  }, [initializeAudio]);
+
+  // Room alert sounds (for catering screen only)
   const playRoomAlert = useCallback((roomId: RoomId) => {
-    const soundPath = SOUNDS.rooms[roomId];
-    if (soundPath) {
-      playSound(soundPath);
-    }
+    console.log('🔊 PLAYING ROOM ALERT for:', roomId);
+    playSound(roomId);
   }, [playSound]);
 
   // Audio settings controls
@@ -71,11 +194,13 @@ export const useAudio = () => {
 
   const setVolume = useCallback((volume: number) => {
     AUDIO_CONFIG.volume = Math.max(0, Math.min(1, volume));
+    // Update volume on all pre-loaded audio elements
+    audioElementsRef.current.forEach(audio => {
+      audio.volume = AUDIO_CONFIG.volume;
+    });
   }, []);
 
   return {
-    playTestSound,
-    playStatusSound,
     playRoomAlert,
     setAudioEnabled,
     setVolume,
